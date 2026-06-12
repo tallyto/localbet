@@ -3,7 +3,6 @@ package com.localbet.bet;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UuidGenerator;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -12,9 +11,8 @@ import java.util.UUID;
 public class BetResult extends PanacheEntityBase {
 
     @Id
-    @UuidGenerator(style = UuidGenerator.Style.RANDOM)
     @Column(columnDefinition = "uuid")
-    public UUID id;
+    public UUID id = UUID.randomUUID();
 
     @com.fasterxml.jackson.annotation.JsonIgnore
     @OneToOne
