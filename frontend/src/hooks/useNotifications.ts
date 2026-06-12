@@ -34,7 +34,7 @@ export function useNotifications() {
 
   const leaderboardQueries = useQueries({
     queries: (groups ?? []).map((group: Group) => ({
-      queryKey: ['leaderboard', group.id, null, false],
+      queryKey: ['leaderboard', group.id, null, false, 'all'],
       queryFn: () => api.get<LeaderboardEntry[]>(`/groups/${group.id}/leaderboard`).then(r => r.data),
       enabled: !!group.id,
       staleTime: 30_000,

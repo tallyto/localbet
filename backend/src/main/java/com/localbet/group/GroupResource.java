@@ -15,6 +15,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.eclipse.microprofile.jwt.JsonWebToken;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.LinkedHashSet;
@@ -180,7 +181,8 @@ public class GroupResource {
     public List<LeaderboardEntry> leaderboard(
             @PathParam("id") UUID groupId,
             @QueryParam("championshipId") UUID championshipId,
-            @QueryParam("standalone") @DefaultValue("false") boolean standalone) {
+            @QueryParam("standalone") @DefaultValue("false") boolean standalone,
+            @QueryParam("period") String period) {
         requireMember(groupId);
 
         String filter = "WHERE b.group.id = :groupId";
@@ -188,6 +190,10 @@ public class GroupResource {
             filter += " AND b.match.championship.id = :champId";
         } else if (standalone) {
             filter += " AND b.match.championship IS NULL";
+        }
+        LocalDateTime fromDate = periodStart(period);
+        if (fromDate != null) {
+            filter += " AND br.calculatedAt >= :fromDate";
         }
 
         var query = com.localbet.bet.BetResult.getEntityManager()
@@ -206,6 +212,9 @@ public class GroupResource {
 
         if (championshipId != null) {
             query.setParameter("champId", championshipId);
+        }
+        if (fromDate != null) {
+            query.setParameter("fromDate", fromDate);
         }
 
         return query.getResultList().stream()
@@ -231,6 +240,16 @@ public class GroupResource {
                 Response.status(403).entity(ERROR_NOT_GROUP_MEMBER).build()
             );
         }
+    }
+
+    private LocalDateTime periodStart(String period) {
+        if ("week".equals(period)) {
+            return LocalDateTime.now().minusDays(7);
+        }
+        if ("month".equals(period)) {
+            return LocalDateTime.now().minusDays(30);
+        }
+        return null;
     }
 
     private String generateCode() {

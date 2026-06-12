@@ -63,14 +63,15 @@ export function useMyRole(groupId: string, userId: string | undefined) {
 
 export function useLeaderboard(
   groupId: string,
-  scope?: { championshipId?: string; standalone?: boolean }
+  scope?: { championshipId?: string; standalone?: boolean; period?: 'all' | 'week' | 'month' }
 ) {
   const params = new URLSearchParams()
   if (scope?.championshipId) params.set('championshipId', scope.championshipId)
   if (scope?.standalone) params.set('standalone', 'true')
+  if (scope?.period && scope.period !== 'all') params.set('period', scope.period)
   const qs = params.toString()
   return useQuery<import('../types').LeaderboardEntry[]>({
-    queryKey: ['leaderboard', groupId, scope?.championshipId ?? null, scope?.standalone ?? false],
+    queryKey: ['leaderboard', groupId, scope?.championshipId ?? null, scope?.standalone ?? false, scope?.period ?? 'all'],
     queryFn: () => api.get(`/groups/${groupId}/leaderboard${qs ? '?' + qs : ''}`).then(r => r.data),
     enabled: !!groupId
   })

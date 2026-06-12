@@ -68,6 +68,7 @@ export function GroupPage() {
   const [tab, setTab] = useState<'matches' | 'leaderboard' | 'activity'>('matches')
   const [showNewMatch, setShowNewMatch] = useState(false)
   const [rankingScope, setRankingScope] = useState<{ type: 'overall' | 'championship' | 'standalone'; championshipId?: string }>({ type: 'overall' })
+  const [rankingPeriod, setRankingPeriod] = useState<'all' | 'week' | 'month'>('all')
 
   const { data: group } = useGroup(groupId ?? '')
   const { data: matches, isLoading } = useGroupMatches(groupId ?? '')
@@ -77,10 +78,10 @@ export function GroupPage() {
   const [showNewChampionship, setShowNewChampionship] = useState(false)
 
   const leaderboardScope = rankingScope.type === 'championship'
-    ? { championshipId: rankingScope.championshipId }
+    ? { championshipId: rankingScope.championshipId, period: rankingPeriod }
     : rankingScope.type === 'standalone'
-    ? { standalone: true }
-    : undefined
+    ? { standalone: true, period: rankingPeriod }
+    : { period: rankingPeriod }
   const { data: leaderboard } = useLeaderboard(groupId ?? '', leaderboardScope)
 
   const hasStandalone = (matches ?? []).some(m => !m.championship)
@@ -228,6 +229,26 @@ export function GroupPage() {
                 Partidas avulsas
               </button>
             )}
+          </div>
+
+          <div className="flex gap-1 mb-4 bg-gray-100 p-1 rounded-lg w-fit">
+            {[
+              { value: 'all', label: 'Sempre' },
+              { value: 'week', label: '7 dias' },
+              { value: 'month', label: '30 dias' },
+            ].map(option => (
+              <button
+                key={option.value}
+                onClick={() => setRankingPeriod(option.value as 'all' | 'week' | 'month')}
+                className={`px-3 py-1.5 text-xs rounded-md font-medium transition-colors ${
+                  rankingPeriod === option.value
+                    ? 'bg-white text-gray-900 shadow-sm'
+                    : 'text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                {option.label}
+              </button>
+            ))}
           </div>
 
           {myLeaderboardEntry && (
