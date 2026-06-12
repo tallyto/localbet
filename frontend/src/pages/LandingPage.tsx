@@ -243,7 +243,7 @@ export function LandingPage() {
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-400">
           <div className="flex items-center gap-2">
             <span className="w-5 h-5 rounded-md bg-brand-600 flex items-center justify-center text-white font-bold text-[10px]">L</span>
-            <span>LocalBet — feito para amigos, sem fins lucrativos.</span>
+            <span>© 2026 LocalBet — feito para amigos, sem fins lucrativos.</span>
           </div>
           <div className="flex items-center gap-4">
             <Link to="/terms" className="hover:text-gray-600 transition-colors">Termos de uso</Link>

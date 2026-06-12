@@ -32,10 +32,10 @@ export function LoginPage() {
     <div className="min-h-screen flex">
       {/* Brand panel */}
       <div className="hidden lg:flex flex-col justify-between w-[420px] bg-brand-700 p-10 flex-shrink-0">
-        <div className="flex items-center gap-2">
+        <Link to="/" className="flex items-center gap-2">
           <span className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center text-white font-bold">L</span>
           <span className="text-white font-bold text-lg">LocalBet</span>
-        </div>
+        </Link>
         <div>
           <p className="text-white/90 text-3xl font-bold leading-tight mb-4">
             Bolão com os amigos,<br />do jeito certo.
@@ -44,16 +44,16 @@ export function LoginPage() {
             Sem banco, sem anúncios. Apenas você e seus amigos apostando nos jogos que mais amam.
           </p>
         </div>
-        <p className="text-white/30 text-xs">© 2025 LocalBet</p>
+        <p className="text-white/30 text-xs">© 2026 LocalBet</p>
       </div>
 
       {/* Form panel */}
       <div className="flex-1 flex items-center justify-center px-4 py-12 bg-gray-50">
         <div className="w-full max-w-sm">
-          <div className="lg:hidden flex items-center gap-2 mb-8">
+          <Link to="/" className="lg:hidden flex items-center gap-2 mb-8">
             <span className="w-8 h-8 rounded-lg bg-brand-600 flex items-center justify-center text-white font-bold">L</span>
             <span className="font-bold text-gray-900 text-lg">LocalBet</span>
-          </div>
+          </Link>
 
           <h1 className="text-2xl font-bold text-gray-900 mb-1">Bem-vindo de volta</h1>
           <p className="text-gray-500 text-sm mb-8">Entre na sua conta para continuar</p>
