@@ -163,18 +163,18 @@ export function LandingPage() {
           <div>
             <p className="text-xs font-semibold uppercase tracking-wide text-brand-600 mb-3">Por que LocalBet?</p>
             <h2 className="text-3xl font-bold text-gray-900 leading-tight">
-              Nasceu no localhost. Foi para a rua para aprender com gente jogando de verdade.
+              Do localhost à bet. Com uma ironia: aqui a ideia não é fazer você perder dinheiro.
             </h2>
           </div>
           <div>
             <p className="text-gray-500 leading-relaxed mb-6">
-              LocalBet é um nome com memória de origem: saiu de um ambiente local, foi publicado em produção e passou a medir o que importa fora da teoria. A pergunta não era “será que a ideia é boa?”, era “o que as pessoas fazem quando conseguem criar um bolão em poucos segundos?”.
+              LocalBet nasceu da vontade de criar uma alternativa simples às plataformas de aposta: um bolão entre pessoas que se conhecem, sem banca tentando te prender. A proposta é tão direta que até seu avô consegue participar: cria a conta, cria o grupo e compartilha o link.
             </p>
             <div className="grid sm:grid-cols-3 gap-3">
               {[
-                ['Baixa fricção', 'Entrar, criar grupo e convidar precisa ser rápido. Se demora, o grupo esfria.'],
-                ['Uso real', 'O produto aprende com partidas, convites, rankings e retornos, não só com suposições.'],
-                ['Diversão que volta', 'XP, feed, badges e notificações existem para transformar placar em hábito social.'],
+                ['Sem cassino', 'O dinheiro e as regras ficam entre vocês. O app organiza o jogo, não joga contra o grupo.'],
+                ['Simples de entrar', 'Cadastro fácil, grupo criado em segundos e convite por link para ninguém se perder.'],
+                ['Família e amigos', 'Feito para o bolão da firma, da família ou do grupo do futebol, com ranking e diversão.'],
               ].map(([title, description]) => (
                 <div key={title} className="rounded-lg border border-gray-200 bg-white p-4">
                   <p className="text-sm font-semibold text-gray-900 mb-1">{title}</p>
