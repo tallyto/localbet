@@ -95,7 +95,7 @@ export function LandingPage() {
           </div>
         </div>
 
-        <div className="hidden lg:block">
+        <div className="hidden lg:flex justify-end pt-4">
           <AppMockup />
         </div>
       </section>
@@ -267,21 +267,22 @@ export function LandingPage() {
 
 function AppMockup() {
   return (
-    <div className="relative select-none">
-      <div className="absolute -inset-4 bg-brand-50 rounded-3xl -z-10" />
+    <div className="relative select-none w-full max-w-[430px]">
+      <div className="absolute -left-8 -right-3 top-10 bottom-8 bg-brand-50 rounded-[2rem] -z-10" />
 
-      {/* Browser chrome */}
-      <div className="bg-gray-800 rounded-t-2xl px-3 py-2 flex items-center gap-1.5">
-        <span className="w-2.5 h-2.5 rounded-full bg-red-400/70" />
-        <span className="w-2.5 h-2.5 rounded-full bg-yellow-400/70" />
-        <span className="w-2.5 h-2.5 rounded-full bg-green-400/70" />
-        <span className="flex-1 bg-gray-700 rounded h-4 ml-2 text-[10px] text-gray-400 flex items-center px-2">
-          localbet.com.br
-        </span>
-      </div>
+      <div className="rounded-[1.35rem] overflow-hidden shadow-2xl border border-gray-200 bg-gray-50">
+        {/* Browser chrome */}
+        <div className="bg-gray-800 px-3 py-2 flex items-center gap-1.5">
+          <span className="w-2.5 h-2.5 rounded-full bg-red-400/70" />
+          <span className="w-2.5 h-2.5 rounded-full bg-yellow-400/70" />
+          <span className="w-2.5 h-2.5 rounded-full bg-green-400/70" />
+          <span className="flex-1 bg-gray-700 rounded h-4 ml-2 text-[10px] text-gray-400 flex items-center px-2">
+            localbet.com.br
+          </span>
+        </div>
 
-      {/* App UI */}
-      <div className="bg-gray-50 rounded-b-2xl p-3 shadow-2xl">
+        {/* App UI */}
+        <div className="p-3">
         {/* Fake nav */}
         <div className="flex items-center justify-between bg-white rounded-xl px-3 py-2 shadow-sm mb-3 border border-gray-100">
           <div className="flex items-center gap-1.5">
@@ -368,6 +369,7 @@ function AppMockup() {
               </div>
             ))}
           </div>
+        </div>
         </div>
       </div>
     </div>
