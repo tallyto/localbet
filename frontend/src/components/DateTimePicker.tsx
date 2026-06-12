@@ -147,8 +147,9 @@ export function DateTimePicker({
           </div>
 
           <div className="flex items-center justify-between gap-3 pt-2 border-t border-gray-100">
-            <label className="text-xs font-medium text-gray-500">Hora</label>
+            <label htmlFor="datetimepicker-time" className="text-xs font-medium text-gray-500">Hora</label>
             <input
+              id="datetimepicker-time"
               type="time"
               value={selectedTime}
               onChange={e => selectTime(e.target.value)}

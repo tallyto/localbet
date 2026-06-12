@@ -2,6 +2,7 @@ import { useState, FormEvent } from 'react'
 import { useNavigate, Link, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { Mail, Lock, Eye, EyeOff, AlertCircle } from 'lucide-react'
+import { usePageTitle } from '../hooks/usePageTitle'
 
 export function LoginPage() {
   const { login } = useAuth()
@@ -13,6 +14,7 @@ export function LoginPage() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const redirect = safeRedirect(searchParams.get('redirect'))
+  usePageTitle('Entrar')
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()

@@ -3,8 +3,10 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { Layout } from '../components/Layout'
 import { useMyGroups, useCreateGroup, useJoinGroup } from '../hooks/useGroups'
 import { Plus, Hash, Users, Copy, Check, ChevronRight, Loader2, Share2 } from 'lucide-react'
+import { usePageTitle } from '../hooks/usePageTitle'
 
 export function DashboardPage() {
+  usePageTitle('Meus bolões')
   const { data: groups, isLoading } = useMyGroups()
   const createGroup = useCreateGroup()
   const joinGroup = useJoinGroup()

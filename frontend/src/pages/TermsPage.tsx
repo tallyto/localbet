@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom'
+import { usePageTitle } from '../hooks/usePageTitle'
 
 export function TermsPage() {
+  usePageTitle('Termos de Uso')
   return (
     <div className="min-h-screen bg-white text-gray-900">
       <nav aria-label="Navegação principal" className="flex items-center justify-between px-6 py-4 max-w-5xl mx-auto border-b border-gray-100">

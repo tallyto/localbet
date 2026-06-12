@@ -6,6 +6,7 @@ import { api } from '../api/client'
 import { useDeleteGroup, useMyGroups } from '../hooks/useGroups'
 import { Group } from '../types'
 import { ConfirmDialog } from '../components/ConfirmDialog'
+import { usePageTitle } from '../hooks/usePageTitle'
 
 export function AccountPage() {
   const { user, logout } = useAuth()
@@ -20,6 +21,7 @@ export function AccountPage() {
   const { data: groups = [] } = useMyGroups()
   const deleteGroup = useDeleteGroup()
 
+  usePageTitle('Minha conta')
   const confirmWord = user?.name ?? ''
   const canDelete = confirm.trim().toLowerCase() === confirmWord.trim().toLowerCase()
   const ownedGroups = groups.filter(group => group.ownerId === user?.userId)
@@ -128,10 +130,11 @@ export function AccountPage() {
               {groupError && <p className="text-xs text-red-500">{groupError}</p>}
 
               <div>
-                <label className="text-xs text-gray-500 mb-1 block">
+                <label htmlFor="confirm-delete" className="text-xs text-gray-500 mb-1 block">
                   Digite seu nome <span className="font-semibold text-gray-700">"{confirmWord}"</span> para confirmar
                 </label>
                 <input
+                  id="confirm-delete"
                   value={confirm}
                   onChange={e => setConfirm(e.target.value)}
                   placeholder={confirmWord}

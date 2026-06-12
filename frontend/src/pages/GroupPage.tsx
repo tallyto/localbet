@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useParams } from 'react-router-dom'
+import { usePageTitle } from '../hooks/usePageTitle'
 import { Layout } from '../components/Layout'
 import { useGroupMatches, useCreateMatch, useSetScore, useUpdateScore, useDeleteMatch, useSports } from '../hooks/useMatches'
 import { useGroupChampionships, useCreateChampionship, useCloseChampionship, useChampionshipRounds, useCreateRound, useDeleteRound, useDeleteChampionship } from '../hooks/useChampionships'
@@ -72,6 +73,7 @@ export function GroupPage() {
   const [rankingPeriod, setRankingPeriod] = useState<'all' | 'week' | 'month'>('all')
 
   const { data: group } = useGroup(groupId ?? '')
+  usePageTitle(group?.name ?? '')
   const { data: matches, isLoading } = useGroupMatches(groupId ?? '')
   const { data: championships } = useGroupChampionships(groupId ?? '')
   const { data: activityEvents } = useGroupActivity(groupId ?? '')
@@ -1310,10 +1312,10 @@ function NewMatchForm({ groupId, championships, onClose }: {
       </div>
       {form.championshipId && (
         <div>
-          <label className="text-xs text-gray-500 mb-1 block">Rodada</label>
+          <label htmlFor="match-round" className="text-xs text-gray-500 mb-1 block">Rodada</label>
           {!creatingRound ? (
             <div className="flex gap-2">
-              <select value={form.roundId} onChange={e => setForm(f => ({ ...f, roundId: e.target.value }))}
+              <select id="match-round" value={form.roundId} onChange={e => setForm(f => ({ ...f, roundId: e.target.value }))}
                 className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
                 <option value="">Sem rodada</option>
                 {rounds?.map(r => <option key={r.id} value={r.id}>{r.name}</option>)}
@@ -1403,13 +1405,13 @@ function NewChampionshipForm({ groupId, onClose }: { groupId: string; onClose: (
         <p className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Regras do bolão</p>
 
         <div>
-          <label className="text-xs text-gray-500 mb-1 flex items-center gap-1">
+          <label htmlFor="championship-scoring" className="text-xs text-gray-500 mb-1 flex items-center gap-1">
             Pontuação
             <Tooltip content={SCORING_RULES_TOOLTIP}>
               <span className="text-gray-400 cursor-help">ⓘ</span>
             </Tooltip>
           </label>
-          <select value={form.scoringMode} onChange={e => setForm(f => ({ ...f, scoringMode: e.target.value }))}
+          <select id="championship-scoring" value={form.scoringMode} onChange={e => setForm(f => ({ ...f, scoringMode: e.target.value }))}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 bg-white">
             <option value="PROPORTIONAL">Proporcional (10 / 7 / 3 pts)</option>
             <option value="EXACT_ONLY">Apenas placar exato (divide o prêmio quem acertar)</option>
@@ -1417,8 +1419,8 @@ function NewChampionshipForm({ groupId, onClose }: { groupId: string; onClose: (
         </div>
 
         <div>
-          <label className="text-xs text-gray-500 mb-1 block">Prêmio</label>
-          <select value={form.betScope} onChange={e => setForm(f => ({ ...f, betScope: e.target.value }))}
+          <label htmlFor="championship-bet-scope" className="text-xs text-gray-500 mb-1 block">Prêmio</label>
+          <select id="championship-bet-scope" value={form.betScope} onChange={e => setForm(f => ({ ...f, betScope: e.target.value }))}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 bg-white">
             <option value="MATCH">Por jogo (prêmio distribuído ao final de cada partida)</option>
             <option value="CHAMPIONSHIP">Campeonato todo (acumula, distribui no encerramento)</option>
@@ -1426,10 +1428,10 @@ function NewChampionshipForm({ groupId, onClose }: { groupId: string; onClose: (
         </div>
 
         <div>
-          <label className="text-xs text-gray-500 mb-1 block">Valor padrão por aposta (opcional)</label>
+          <label htmlFor="championship-default-bet" className="text-xs text-gray-500 mb-1 block">Valor padrão por aposta (opcional)</label>
           <div className="flex items-center gap-1 border border-gray-300 rounded-lg px-3 py-2 bg-white focus-within:ring-2 focus-within:ring-green-500">
-            <span className="text-gray-400 text-sm">R$</span>
-            <input type="number" min="0" step="0.01" value={form.defaultBetAmount}
+            <span aria-hidden="true" className="text-gray-400 text-sm">R$</span>
+            <input id="championship-default-bet" type="number" min="0" step="0.01" value={form.defaultBetAmount}
               onChange={e => setForm(f => ({ ...f, defaultBetAmount: e.target.value }))}
               placeholder="0,00" className="flex-1 outline-none text-sm" />
           </div>

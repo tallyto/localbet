@@ -1,6 +1,6 @@
 import { useAuth } from '../context/AuthContext'
 import { useNavigate, Link } from 'react-router-dom'
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { LogOut, User, ChevronRight, Bell, Award, Trophy, Target } from 'lucide-react'
 import { useNotifications } from '../hooks/useNotifications'
 
@@ -14,6 +14,19 @@ export function Layout({ children, breadcrumb }: { children: React.ReactNode; br
   const { notifications, unreadCount, readIds, markAllAsRead, markAsRead } = useNotifications()
   const navigate = useNavigate()
   const [showNotifications, setShowNotifications] = useState(false)
+  const notifButtonRef = useRef<HTMLButtonElement>(null)
+
+  useEffect(() => {
+    if (!showNotifications) return
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape') {
+        setShowNotifications(false)
+        notifButtonRef.current?.focus()
+      }
+    }
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [showNotifications])
 
   function handleLogout() {
     logout()
@@ -32,11 +45,11 @@ export function Layout({ children, breadcrumb }: { children: React.ReactNode; br
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <nav className="bg-white shadow-nav sticky top-0 z-30">
+      <nav aria-label="Navegação principal" className="bg-white shadow-nav sticky top-0 z-30">
         <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
           <div className="flex items-center gap-1.5 min-w-0">
             <Link to="/dashboard" className="flex items-center gap-1.5 flex-shrink-0">
-              <span className="w-7 h-7 rounded-lg bg-brand-600 flex items-center justify-center text-white font-bold text-sm">
+              <span aria-hidden="true" className="w-7 h-7 rounded-lg bg-brand-600 flex items-center justify-center text-white font-bold text-sm">
                 L
               </span>
               <span className="font-bold text-gray-900 text-sm hidden sm:block">LocalBet</span>
@@ -59,11 +72,14 @@ export function Layout({ children, breadcrumb }: { children: React.ReactNode; br
           <div className="flex items-center gap-1 flex-shrink-0">
             <div className="relative">
               <button
+                ref={notifButtonRef}
                 onClick={() => setShowNotifications(open => !open)}
+                aria-label="Notificações"
+                aria-expanded={showNotifications}
+                aria-haspopup="true"
                 className="relative p-1.5 rounded-lg text-gray-400 hover:text-brand-600 hover:bg-brand-50 transition-colors"
-                title="Notificações"
               >
-                <Bell className="w-4 h-4" />
+                <Bell aria-hidden="true" className="w-4 h-4" />
                 {unreadCount > 0 && (
                   <span className="absolute -top-0.5 -right-0.5 min-w-4 h-4 px-1 rounded-full bg-red-500 text-white text-[10px] leading-4 text-center font-bold">
                     {unreadCount > 9 ? '9+' : unreadCount}
@@ -148,10 +164,10 @@ export function Layout({ children, breadcrumb }: { children: React.ReactNode; br
             </Link>
             <button
               onClick={handleLogout}
+              aria-label="Sair da conta"
               className="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors"
-              title="Sair"
             >
-              <LogOut className="w-4 h-4" />
+              <LogOut aria-hidden="true" className="w-4 h-4" />
             </button>
           </div>
         </div>

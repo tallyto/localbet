@@ -2,6 +2,7 @@ import { useState, FormEvent } from 'react'
 import { useNavigate, Link, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { Mail, Lock, Eye, EyeOff, User, AlertCircle } from 'lucide-react'
+import { usePageTitle } from '../hooks/usePageTitle'
 
 export function RegisterPage() {
   const { register } = useAuth()
@@ -15,6 +16,7 @@ export function RegisterPage() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const redirect = safeRedirect(searchParams.get('redirect'))
+  usePageTitle('Criar conta')
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()

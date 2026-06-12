@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { api } from '../api/client'
+import { usePageTitle } from '../hooks/usePageTitle'
 import { Shield, Trophy, Check, ChevronRight, Bell, Activity, Share2, CalendarRange } from 'lucide-react'
 
 interface Stats {
@@ -35,16 +36,17 @@ function AnimatedNumber({ value }: { value: number }) {
 }
 
 export function LandingPage() {
+  usePageTitle('')
   const stats = usePublicStats()
 
   return (
     <div className="min-h-screen bg-white text-gray-900 font-sans">
 
       {/* Nav */}
-      <nav className="sticky top-0 z-30 bg-white/90 backdrop-blur border-b border-gray-100">
+      <nav aria-label="Navegação principal" className="sticky top-0 z-30 bg-white/90 backdrop-blur border-b border-gray-100">
         <div className="max-w-6xl mx-auto px-5 h-14 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="w-7 h-7 rounded-lg bg-brand-600 flex items-center justify-center text-white font-bold text-sm">L</span>
+            <span aria-hidden="true" className="w-7 h-7 rounded-lg bg-brand-600 flex items-center justify-center text-white font-bold text-sm">L</span>
             <span className="font-bold text-gray-900">LocalBet</span>
           </div>
           <div className="flex items-center gap-2">
@@ -59,6 +61,7 @@ export function LandingPage() {
       </nav>
 
       {/* Hero */}
+      <main>
       <section className="max-w-6xl mx-auto px-5 pt-16 pb-12 grid lg:grid-cols-[0.9fr_1.1fr] gap-10 items-center">
         <div>
           <div className="inline-flex items-center gap-1.5 bg-brand-50 text-brand-700 text-xs font-semibold px-3 py-1.5 rounded-full mb-6 border border-brand-100">
@@ -95,7 +98,7 @@ export function LandingPage() {
           </div>
         </div>
 
-        <div className="hidden lg:flex justify-end pt-4">
+        <div aria-hidden="true" className="hidden lg:flex justify-end pt-4">
           <AppMockup />
         </div>
       </section>
@@ -195,13 +198,13 @@ export function LandingPage() {
           </div>
 
           <div className="relative">
-            <div className="absolute left-5 top-8 bottom-8 w-px bg-brand-100 hidden sm:block" />
-            <div className="space-y-8">
+            <div aria-hidden="true" className="absolute left-5 top-8 bottom-8 w-px bg-brand-100 hidden sm:block" />
+            <ol className="space-y-8 list-none">
               <Step n={1} title="Crie o grupo" description="Dê um nome para o bolão e compartilhe o link de convite com os participantes." />
               <Step n={2} title="Monte campeonatos e partidas" description="Organize jogos avulsos, campeonatos, rodadas e regras de pontuação." />
               <Step n={3} title="Cada pessoa aposta" description="Os palpites ficam ocultos até o jogo acabar, mantendo a disputa justa." />
               <Step n={4} title="O jogo ganha vida" description="Ao lançar o placar, o app atualiza ranking, XP, badges, feed, notificações e prêmio." />
-            </div>
+            </ol>
           </div>
         </div>
       </section>
@@ -238,6 +241,8 @@ export function LandingPage() {
         </div>
       </section>
 
+      </main>
+
       {/* Footer */}
       <footer className="border-t border-gray-100 py-8 px-5">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-400">
@@ -251,9 +256,10 @@ export function LandingPage() {
               href="https://www.paypal.com/donate?business=rodrigues.tallyto%40hotmail.com&currency_code=BRL&item_name=LocalBet"
               target="_blank"
               rel="noopener noreferrer"
+              aria-label="Apoiar o LocalBet via PayPal (abre em nova aba)"
               className="inline-flex items-center gap-1 bg-blue-500 hover:bg-blue-600 text-white px-2.5 py-1 rounded-md font-semibold transition-colors"
             >
-              <svg className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor">
+              <svg aria-hidden="true" className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944 2.79A.859.859 0 0 1 5.79 2h8.263c2.77 0 4.744.638 5.876 1.898.537.594.882 1.26 1.026 1.978.153.77.13 1.667-.07 2.674l-.007.042c-.595 3.02-2.64 4.556-6.09 4.556H13.2a.859.859 0 0 0-.848.728l-.022.12-.677 4.296-.03.165a.641.641 0 0 1-.633.54H7.076z"/>
               </svg>
               Apoiar
@@ -385,7 +391,7 @@ function AppMockup() {
 function StatItem({ value, label }: { value: number; label: string }) {
   return (
     <div>
-      <p className="text-3xl font-extrabold text-brand-600">
+      <p aria-live="polite" className="text-3xl font-extrabold text-brand-600">
         <AnimatedNumber value={value} />+
       </p>
       <p className="text-sm text-gray-500 mt-1">{label}</p>
@@ -407,14 +413,14 @@ function FeatureCard({ icon, title, description }: { icon: React.ReactNode; titl
 
 function Step({ n, title, description }: { n: number; title: string; description: string }) {
   return (
-    <div className="flex gap-5 items-start relative">
-      <span className="w-10 h-10 rounded-full bg-brand-600 text-white flex items-center justify-center text-sm font-bold flex-shrink-0 z-10 shadow-md">
+    <li className="flex gap-5 items-start relative">
+      <span aria-hidden="true" className="w-10 h-10 rounded-full bg-brand-600 text-white flex items-center justify-center text-sm font-bold flex-shrink-0 z-10 shadow-md">
         {n}
       </span>
       <div className="pt-1.5">
         <p className="font-semibold text-gray-900 mb-1">{title}</p>
         <p className="text-sm text-gray-500 leading-relaxed">{description}</p>
       </div>
-    </div>
+    </li>
   )
 }
