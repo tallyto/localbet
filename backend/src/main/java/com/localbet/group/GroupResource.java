@@ -194,6 +194,7 @@ public class GroupResource {
             .createQuery(
                 "SELECT b.user.id, b.user.name, SUM(br.points), " +
                 "SUM(CASE WHEN br.isExact = true THEN 1 ELSE 0 END), " +
+                "COUNT(b.id), " +
                 "SUM(b.amount), SUM(br.winnings) " +
                 "FROM BetResult br JOIN br.bet b " +
                 filter +
@@ -213,8 +214,9 @@ public class GroupResource {
                 (String) r[1],
                 ((Number) r[2]).longValue(),
                 ((Number) r[3]).longValue(),
-                (java.math.BigDecimal) r[4],
-                (java.math.BigDecimal) r[5]
+                ((Number) r[4]).longValue(),
+                (java.math.BigDecimal) r[5],
+                (java.math.BigDecimal) r[6]
             ))
             .toList();
     }

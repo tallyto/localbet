@@ -77,6 +77,11 @@ export interface LeaderboardEntry {
   userName: string
   totalPoints: number
   exactScores: number
+  totalBets: number
   totalBet: number
   totalWinnings: number
+  xp: number
+  level: number
+  nextLevelXp: number
+  badges: string[]
 }

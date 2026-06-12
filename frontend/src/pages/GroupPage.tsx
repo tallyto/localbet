@@ -9,7 +9,7 @@ import { useAuth } from '../context/AuthContext'
 import { Championship, Match } from '../types'
 import { ConfirmDialog } from '../components/ConfirmDialog'
 import { DateTimePicker } from '../components/DateTimePicker'
-import { Plus, Trophy, Swords, Trash2, ChevronDown, ChevronUp, Loader2, Target, Info, List, Columns } from 'lucide-react'
+import { Plus, Trophy, Swords, Trash2, ChevronDown, ChevronUp, Loader2, Target, Info, List, Columns, Award, Star } from 'lucide-react'
 
 function Tooltip({ children, content }: { children: React.ReactNode; content: React.ReactNode }) {
   return (
@@ -222,35 +222,87 @@ export function GroupPage() {
             <div className="space-y-2">
               {leaderboard.map((entry, i) => {
                 const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : null
+                const currentLevelXp = (entry.level - 1) * 100
+                const levelProgress = entry.nextLevelXp > currentLevelXp
+                  ? Math.min(100, Math.max(0, ((entry.xp - currentLevelXp) / (entry.nextLevelXp - currentLevelXp)) * 100))
+                  : 100
+                const badges = entry.badges ?? []
+                const visibleBadges = badges.slice(0, 3)
                 return (
-                  <div key={entry.userId} className={`flex items-center gap-3 p-4 rounded-xl border transition-colors ${
+                  <div key={entry.userId} className={`p-4 rounded-xl border transition-colors ${
                     i === 0 ? 'bg-yellow-50 border-yellow-200' :
                     i === 1 ? 'bg-gray-50 border-gray-200' :
                     i === 2 ? 'bg-orange-50 border-orange-100' :
                     'bg-white border-gray-200'
                   }`}>
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 ${
-                      i === 0 ? 'bg-yellow-100 text-yellow-700' :
-                      i === 1 ? 'bg-gray-200 text-gray-600' :
-                      i === 2 ? 'bg-orange-100 text-orange-600' :
-                      'bg-gray-100 text-gray-500'
-                    }`}>
-                      {medal ?? i + 1}
-                    </div>
+                    <div className="flex items-start gap-3">
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 ${
+                        i === 0 ? 'bg-yellow-100 text-yellow-700' :
+                        i === 1 ? 'bg-gray-200 text-gray-600' :
+                        i === 2 ? 'bg-orange-100 text-orange-600' :
+                        'bg-gray-100 text-gray-500'
+                      }`}>
+                        {medal ?? i + 1}
+                      </div>
 
-                    <div className="flex-1 min-w-0">
-                      <p className="font-semibold text-gray-900">{entry.userName}</p>
-                      <p className="text-xs text-gray-400 flex items-center gap-1">
-                        <Target className="w-3 h-3" />
-                        {entry.exactScores} acerto{entry.exactScores !== 1 ? 's' : ''} exato{entry.exactScores !== 1 ? 's' : ''}
-                      </p>
-                    </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="min-w-0">
+                            <p className="font-semibold text-gray-900 truncate">{entry.userName}</p>
+                            <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-400">
+                              <span className="inline-flex items-center gap-1">
+                                <Target className="w-3 h-3" />
+                                {entry.exactScores} exato{entry.exactScores !== 1 ? 's' : ''}
+                              </span>
+                              <span>{entry.totalBets} palpite{entry.totalBets !== 1 ? 's' : ''}</span>
+                            </div>
+                          </div>
 
-                    <span className={`text-base font-bold flex-shrink-0 ${
-                      i === 0 ? 'text-yellow-600' : i === 1 ? 'text-gray-600' : i === 2 ? 'text-orange-500' : 'text-brand-600'
-                    }`}>
-                      {entry.totalPoints} pts
-                    </span>
+                          <div className="text-right flex-shrink-0">
+                            <span className={`text-base font-bold block ${
+                              i === 0 ? 'text-yellow-600' : i === 1 ? 'text-gray-600' : i === 2 ? 'text-orange-500' : 'text-brand-600'
+                            }`}>
+                              {entry.totalPoints} pts
+                            </span>
+                            <span className="text-xs text-gray-400 inline-flex items-center gap-1 justify-end">
+                              <Star className="w-3 h-3" />
+                              {entry.xp} XP
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="mt-3 flex items-center gap-2">
+                          <span className="inline-flex items-center gap-1 text-xs font-semibold text-brand-700 bg-brand-50 border border-brand-100 px-2 py-1 rounded-full">
+                            <Award className="w-3 h-3" />
+                            Nível {entry.level}
+                          </span>
+                          <div className="h-2 flex-1 rounded-full bg-gray-100 overflow-hidden">
+                            <div
+                              className="h-full rounded-full bg-brand-500"
+                              style={{ width: `${levelProgress}%` }}
+                            />
+                          </div>
+                          <span className="text-[11px] text-gray-400 w-16 text-right">
+                            {entry.nextLevelXp - entry.xp} XP
+                          </span>
+                        </div>
+
+                        {visibleBadges.length > 0 && (
+                          <div className="mt-3 flex flex-wrap gap-1.5">
+                            {visibleBadges.map(badge => (
+                              <span key={badge} className="text-[11px] font-medium px-2 py-1 rounded-full bg-white/70 border border-gray-200 text-gray-600">
+                                {badge}
+                              </span>
+                            ))}
+                            {badges.length > visibleBadges.length && (
+                              <span className="text-[11px] font-medium px-2 py-1 rounded-full bg-gray-100 text-gray-500">
+                                +{badges.length - visibleBadges.length}
+                              </span>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   </div>
                 )
               })}
