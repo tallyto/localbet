@@ -1,20 +1,29 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { Layout } from '../components/Layout'
 import { useMyGroups, useCreateGroup, useJoinGroup } from '../hooks/useGroups'
-import { Plus, Hash, Users, Copy, Check, ChevronRight, Loader2 } from 'lucide-react'
+import { Plus, Hash, Users, Copy, Check, ChevronRight, Loader2, Share2 } from 'lucide-react'
 
 export function DashboardPage() {
   const { data: groups, isLoading } = useMyGroups()
   const createGroup = useCreateGroup()
   const joinGroup = useJoinGroup()
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
 
   const [showCreate, setShowCreate] = useState(false)
   const [showJoin, setShowJoin] = useState(false)
   const [groupName, setGroupName] = useState('')
   const [inviteCode, setInviteCode] = useState('')
   const [error, setError] = useState('')
+
+  useEffect(() => {
+    const code = searchParams.get('inviteCode')
+    if (!code) return
+    setInviteCode(code.toUpperCase())
+    setShowJoin(true)
+    setShowCreate(false)
+  }, [searchParams])
 
   async function handleCreate(e: React.FormEvent) {
     e.preventDefault()
@@ -143,12 +152,21 @@ function GroupCard({
   onClick: () => void
 }) {
   const [copied, setCopied] = useState(false)
+  const [copiedLink, setCopiedLink] = useState(false)
 
   function copyCode(e: React.MouseEvent) {
     e.stopPropagation()
     navigator.clipboard.writeText(group.inviteCode)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
+  }
+
+  function copyInviteLink(e: React.MouseEvent) {
+    e.stopPropagation()
+    const url = `${window.location.origin}/dashboard?inviteCode=${group.inviteCode}`
+    navigator.clipboard.writeText(url)
+    setCopiedLink(true)
+    setTimeout(() => setCopiedLink(false), 2000)
   }
 
   return (
@@ -171,6 +189,13 @@ function GroupCard({
                 title="Copiar código"
               >
                 {copied ? <Check className="w-3 h-3 text-brand-500" /> : <Copy className="w-3 h-3" />}
+              </button>
+              <button
+                onClick={copyInviteLink}
+                className="text-gray-300 hover:text-brand-600 transition-colors"
+                title="Copiar link de convite"
+              >
+                {copiedLink ? <Check className="w-3 h-3 text-brand-500" /> : <Share2 className="w-3 h-3" />}
               </button>
             </div>
           </div>
