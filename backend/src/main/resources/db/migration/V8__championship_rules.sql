@@ -1,0 +1,5 @@
+ALTER TABLE championships
+  ADD COLUMN scoring_mode    VARCHAR(20)    NOT NULL DEFAULT 'PROPORTIONAL',
+  ADD COLUMN bet_scope       VARCHAR(20)    NOT NULL DEFAULT 'MATCH',
+  ADD COLUMN default_bet_amount DECIMAL(10,2),
+  ADD COLUMN status          VARCHAR(20)    NOT NULL DEFAULT 'ACTIVE';
