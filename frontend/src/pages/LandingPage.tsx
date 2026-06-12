@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { api } from '../api/client'
-import { Users, Shield, Trophy, Zap, Check, ChevronRight } from 'lucide-react'
+import { Shield, Trophy, Check, ChevronRight, Bell, Activity, Share2, CalendarRange } from 'lucide-react'
 
 interface Stats {
   users: number
@@ -59,20 +59,24 @@ export function LandingPage() {
       </nav>
 
       {/* Hero */}
-      <section className="max-w-6xl mx-auto px-5 pt-16 pb-12 grid lg:grid-cols-2 gap-10 items-center">
-        <div>
+      <section className="relative overflow-hidden bg-gray-950">
+        <div className="absolute inset-y-8 right-[-7rem] hidden lg:block w-[36rem] opacity-80">
+          <AppMockup />
+        </div>
+        <div className="max-w-6xl mx-auto px-5 py-20 lg:py-24 relative">
+          <div className="max-w-xl">
           <div className="inline-flex items-center gap-1.5 bg-brand-50 text-brand-700 text-xs font-semibold px-3 py-1.5 rounded-full mb-6 border border-brand-100">
             <span className="w-1.5 h-1.5 rounded-full bg-brand-500 animate-pulse" />
-            Copa do Mundo 2026 chegando
+            Ranking, XP, badges e notificações
           </div>
 
-          <h1 className="text-4xl sm:text-5xl font-extrabold text-gray-900 leading-[1.1] mb-5">
-            Bolão com amigos,<br />
-            <span className="text-brand-600">sem complicação.</span>
+          <h1 className="text-4xl sm:text-5xl font-extrabold text-white leading-[1.1] mb-5">
+            LocalBet<br />
+            <span className="text-brand-400">o bolão virou jogo.</span>
           </h1>
 
-          <p className="text-lg text-gray-500 leading-relaxed mb-8 max-w-lg">
-            Aposte nos placares, acompanhe o ranking e distribua o prêmio entre o grupo — sem banca, sem anúncios, sem taxas escondidas.
+          <p className="text-lg text-gray-300 leading-relaxed mb-8 max-w-lg">
+            Crie grupos, convide por link, acompanhe feed, notificações, ranking por período, XP, níveis e conquistas. Tudo sem banca no meio.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3 mb-8">
@@ -80,24 +84,20 @@ export function LandingPage() {
               Criar meu bolão agora
               <ChevronRight className="w-4 h-4" />
             </Link>
-            <Link to="/login" className="btn-outline px-6 py-3 text-base">
+            <Link to="/login" className="inline-flex items-center justify-center gap-2 px-6 py-3 border border-white/30 text-white rounded-lg text-base font-medium hover:bg-white/10 transition-colors">
               Já tenho conta
             </Link>
           </div>
 
-          <div className="flex items-center gap-5 text-sm text-gray-400">
-            {['Gratuito', 'Sem cadastro de cartão', 'Funciona no celular'].map(t => (
+          <div className="flex flex-wrap items-center gap-4 text-sm text-gray-300">
+            {['Gratuito', 'Sem cartão', 'Convite por link', 'Funciona no celular'].map(t => (
               <span key={t} className="flex items-center gap-1">
                 <Check className="w-3.5 h-3.5 text-brand-500 flex-shrink-0" />
                 {t}
               </span>
             ))}
           </div>
-        </div>
-
-        {/* App mockup */}
-        <div className="hidden lg:block">
-          <AppMockup />
+          </div>
         </div>
       </section>
 
@@ -123,7 +123,7 @@ export function LandingPage() {
             </p>
           </div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
             <FeatureCard
               icon={<Shield className="w-5 h-5 text-brand-600" />}
               title="Dinheiro entre vocês"
@@ -131,18 +131,28 @@ export function LandingPage() {
             />
             <FeatureCard
               icon={<Trophy className="w-5 h-5 text-brand-600" />}
-              title="Ranking automático"
-              description="Pontuação calculada na hora que o placar é lançado. Sem planilha, sem briga."
+              title="Ranking com XP"
+              description="Além dos pontos, cada pessoa evolui nível, ganha XP e desbloqueia conquistas."
             />
             <FeatureCard
-              icon={<Zap className="w-5 h-5 text-brand-600" />}
-              title="Campeonatos e rodadas"
-              description="Organize por Copa, Série A, rodadas ou qualquer estrutura. Do simples ao avançado."
+              icon={<Bell className="w-5 h-5 text-brand-600" />}
+              title="Notificações"
+              description="O sininho mostra liderança, pódio, badges, placares exatos e novidades do grupo."
             />
             <FeatureCard
-              icon={<Users className="w-5 h-5 text-brand-600" />}
-              title="Convide com um código"
-              description="Compartilhe um código de 8 letras. Qualquer um entra no grupo em segundos."
+              icon={<Activity className="w-5 h-5 text-brand-600" />}
+              title="Feed do grupo"
+              description="Partidas finalizadas, líderes e conquistas viram uma linha do tempo fácil de acompanhar."
+            />
+            <FeatureCard
+              icon={<CalendarRange className="w-5 h-5 text-brand-600" />}
+              title="Ranking por período"
+              description="Compare o desempenho geral, dos últimos 7 dias ou dos últimos 30 dias."
+            />
+            <FeatureCard
+              icon={<Share2 className="w-5 h-5 text-brand-600" />}
+              title="Convite por link"
+              description="Compartilhe um link do grupo. Quem abrir já chega com o código pronto para entrar."
             />
           </div>
         </div>
@@ -153,16 +163,16 @@ export function LandingPage() {
         <div className="max-w-3xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900 mb-3">Como funciona</h2>
-            <p className="text-gray-500">Em quatro passos você já está apostando.</p>
+            <p className="text-gray-500">Em quatro passos o grupo já tem bolão, ranking e disputa rolando.</p>
           </div>
 
           <div className="relative">
             <div className="absolute left-5 top-8 bottom-8 w-px bg-brand-100 hidden sm:block" />
             <div className="space-y-8">
-              <Step n={1} title="Crie um grupo" description="Dê um nome para o bolão. Um código de convite é gerado automaticamente." />
-              <Step n={2} title="Adicione as partidas" description="Cadastre os jogos do campeonato — pode ser Copa do Mundo, Série A, NBA ou qualquer torneio." />
-              <Step n={3} title="Cada um aposta o placar" description="Os participantes apostam em qual placar acham que vai dar. Os palpites ficam ocultos até o jogo acabar." />
-              <Step n={4} title="Resultado lançado, prêmio calculado" description="O admin registra o placar final. O sistema distribui os pontos e o prêmio automaticamente." />
+              <Step n={1} title="Crie o grupo" description="Dê um nome para o bolão e compartilhe o link de convite com os participantes." />
+              <Step n={2} title="Monte campeonatos e partidas" description="Organize jogos avulsos, campeonatos, rodadas e regras de pontuação." />
+              <Step n={3} title="Cada pessoa aposta" description="Os palpites ficam ocultos até o jogo acabar, mantendo a disputa justa." />
+              <Step n={4} title="O jogo ganha vida" description="Ao lançar o placar, o app atualiza ranking, XP, badges, feed, notificações e prêmio." />
             </div>
           </div>
         </div>
@@ -189,8 +199,8 @@ export function LandingPage() {
       <section className="py-24 px-5 text-center">
         <div className="max-w-xl mx-auto">
           <h2 className="text-4xl font-extrabold text-gray-900 mb-4 leading-tight">
-            Seu grupo está esperando.<br />
-            <span className="text-brand-600">Começa agora.</span>
+            Seu grupo merece mais que uma planilha.<br />
+            <span className="text-brand-600">Comece o jogo.</span>
           </h2>
           <p className="text-gray-500 mb-8">Gratuito. Sem cartão de crédito. Pronto em 1 minuto.</p>
           <Link to="/register" className="btn-primary px-8 py-3.5 text-base">
@@ -252,86 +262,84 @@ function AppMockup() {
             <span className="text-gray-300 text-[10px]">›</span>
             <span className="text-[10px] text-gray-500">Copa 2026</span>
           </div>
-          <span className="w-6 h-6 rounded-full bg-brand-100 text-brand-700 text-[9px] font-bold flex items-center justify-center">JD</span>
+          <div className="flex items-center gap-1.5">
+            <span className="relative w-6 h-6 rounded-full bg-gray-100 text-gray-500 flex items-center justify-center">
+              <Bell className="w-3 h-3" />
+              <span className="absolute -top-0.5 -right-0.5 w-3 h-3 rounded-full bg-red-500 text-white text-[7px] leading-3 text-center font-bold">3</span>
+            </span>
+            <span className="w-6 h-6 rounded-full bg-brand-100 text-brand-700 text-[9px] font-bold flex items-center justify-center">JD</span>
+          </div>
         </div>
 
         {/* Tab bar */}
         <div className="flex gap-0.5 mb-3 bg-gray-100 p-0.5 rounded-lg w-fit">
-          <span className="bg-white text-gray-900 shadow-sm text-[10px] font-medium px-3 py-1 rounded-md">Partidas</span>
+          <span className="text-gray-500 text-[10px] font-medium px-3 py-1">Partidas</span>
           <span className="text-gray-500 text-[10px] font-medium px-3 py-1">Ranking</span>
+          <span className="bg-white text-gray-900 shadow-sm text-[10px] font-medium px-3 py-1 rounded-md">Feed</span>
         </div>
 
-        {/* Match cards */}
-        <div className="space-y-2">
-          <MockMatchCard
-            home="Brasil" away="Argentina"
-            status="Agendada" statusClass="bg-blue-50 text-blue-600"
-            date="Sáb 14 jun · 18:00"
-            badge={{ text: '2×1', class: 'bg-brand-50 text-brand-700 border border-brand-100' }}
-          />
-          <MockMatchCard
-            home="França" away="Portugal"
-            score="2 × 1"
-            status="Encerrado" statusClass="bg-gray-100 text-gray-500"
-            date="Sex 13 jun · 15:00"
-            pts={{ text: '10 pts', class: 'bg-green-50 text-green-700 border-green-200' }}
-          />
-          <MockMatchCard
-            home="Espanha" away="Alemanha"
-            status="Ao vivo" statusClass="bg-brand-100 text-brand-700"
-            date="Dom 15 jun · 12:00"
-          />
+        <div className="grid grid-cols-4 gap-1.5 mb-3">
+          {[
+            ['Jogos', '18'],
+            ['Finalizados', '9'],
+            ['Abertos', '7'],
+            ['Campeonatos', '2'],
+          ].map(([label, value]) => (
+            <div key={label} className="bg-white rounded-lg border border-gray-100 px-2 py-1.5">
+              <p className="text-[7px] uppercase text-gray-400 font-bold">{label}</p>
+              <p className="text-[12px] font-extrabold text-gray-900">{value}</p>
+            </div>
+          ))}
         </div>
 
         {/* Ranking preview */}
         <div className="mt-3 bg-white rounded-xl border border-gray-100 p-2.5">
-          <p className="text-[10px] font-bold text-gray-500 uppercase tracking-wide mb-2">Ranking</p>
-          <div className="space-y-1.5">
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-[10px] font-bold text-gray-500 uppercase tracking-wide">Ranking</p>
+            <span className="text-[8px] bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded">7 dias</span>
+          </div>
+          <div className="space-y-2">
             {[
-              { pos: '🥇', name: 'João D.', pts: '37 pts', color: 'text-yellow-600' },
-              { pos: '🥈', name: 'Maria S.', pts: '28 pts', color: 'text-gray-500' },
-              { pos: '🥉', name: 'Pedro L.', pts: '21 pts', color: 'text-orange-500' },
+              { pos: '🥇', name: 'João D.', pts: '37 pts', xp: '235 XP', badge: 'Na mosca', color: 'text-yellow-600' },
+              { pos: '🥈', name: 'Maria S.', pts: '28 pts', xp: '180 XP', badge: 'Nível 2', color: 'text-gray-500' },
+              { pos: '🥉', name: 'Pedro L.', pts: '21 pts', xp: '145 XP', badge: 'Fiel', color: 'text-orange-500' },
             ].map(e => (
-              <div key={e.name} className="flex items-center justify-between text-[10px]">
-                <span className="flex items-center gap-1.5">
-                  <span>{e.pos}</span>
-                  <span className="font-medium text-gray-700">{e.name}</span>
-                </span>
-                <span className={`font-bold ${e.color}`}>{e.pts}</span>
+              <div key={e.name} className="text-[10px]">
+                <div className="flex items-center justify-between">
+                  <span className="flex items-center gap-1.5">
+                    <span>{e.pos}</span>
+                    <span className="font-medium text-gray-700">{e.name}</span>
+                  </span>
+                  <span className={`font-bold ${e.color}`}>{e.pts}</span>
+                </div>
+                <div className="ml-5 mt-0.5 flex items-center gap-1.5">
+                  <span className="text-[8px] text-gray-400">{e.xp}</span>
+                  <span className="text-[8px] bg-brand-50 text-brand-700 border border-brand-100 rounded-full px-1.5 py-0.5">{e.badge}</span>
+                </div>
               </div>
             ))}
           </div>
         </div>
-      </div>
-    </div>
-  )
-}
 
-function MockMatchCard({
-  home, away, score, date, status, statusClass, badge, pts
-}: {
-  home: string; away: string; score?: string; date: string
-  status: string; statusClass: string
-  badge?: { text: string; class: string }
-  pts?: { text: string; class: string }
-}) {
-  return (
-    <div className="bg-white rounded-xl border border-gray-200 px-3 py-2">
-      <div className="flex items-center justify-between gap-2">
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-1.5 text-[11px]">
-            <span className="font-semibold text-gray-900 truncate">{home}</span>
-            <span className={`font-bold px-1.5 py-0.5 rounded text-[10px] flex-shrink-0 ${score ? 'bg-gray-100 text-gray-700 font-mono' : 'bg-gray-100 text-gray-400'}`}>
-              {score ?? 'vs'}
-            </span>
-            <span className="font-semibold text-gray-900 truncate">{away}</span>
+        <div className="mt-3 bg-white rounded-xl border border-gray-100 p-2.5">
+          <p className="text-[10px] font-bold text-gray-500 uppercase tracking-wide mb-2">Feed</p>
+          <div className="space-y-2">
+            {[
+              ['João desbloqueou Mão cirúrgica', '3 placares exatos no grupo.'],
+              ['Brasil 2 x 1 Argentina', 'Partida finalizada · Rodada 2'],
+              ['Maria entrou no pódio', 'Subiu para o 2º lugar.'],
+            ].map(([title, desc]) => (
+              <div key={title} className="flex gap-2">
+                <span className="w-6 h-6 rounded-md bg-blue-50 text-blue-700 flex items-center justify-center flex-shrink-0">
+                  <Activity className="w-3 h-3" />
+                </span>
+                <span className="min-w-0">
+                  <span className="block text-[9px] font-semibold text-gray-800 truncate">{title}</span>
+                  <span className="block text-[8px] text-gray-400 truncate">{desc}</span>
+                </span>
+              </div>
+            ))}
           </div>
-          <p className="text-[9px] text-gray-400 mt-0.5">{date}</p>
-        </div>
-        <div className="flex items-center gap-1 flex-shrink-0">
-          {pts && <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded-full border ${pts.class}`}>{pts.text}</span>}
-          {badge && <span className={`text-[9px] font-medium px-1.5 py-0.5 rounded-full ${badge.class}`}>{badge.text}</span>}
-          <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-medium ${statusClass}`}>{status}</span>
         </div>
       </div>
     </div>
