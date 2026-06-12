@@ -40,6 +40,7 @@ public class GroupResource {
     }
 
     @GET
+    @Transactional
     public List<Group> myGroups() {
         return Group.findByUserId(currentUserId());
     }
@@ -96,6 +97,7 @@ public class GroupResource {
 
     @GET
     @Path("/{id}")
+    @Transactional
     public Response getGroup(@PathParam("id") UUID groupId) {
         Group g = Group.findById(groupId);
         if (g == null) return Response.status(404).build();

@@ -1,5 +1,6 @@
 package com.localbet.group;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.localbet.user.User;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
@@ -24,6 +25,7 @@ public class Group extends PanacheEntityBase {
     @Column(name = "invite_code", nullable = false, unique = true, length = 20)
     public String inviteCode;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id", nullable = false)
     public User owner;
