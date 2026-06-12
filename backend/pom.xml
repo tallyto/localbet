@@ -41,6 +41,12 @@
       <artifactId>quarkus-rest-jackson</artifactId>
     </dependency>
 
+    <!-- Health endpoints (/q/health/live, /q/health/ready) -->
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-smallrye-health</artifactId>
+    </dependency>
+
     <!-- Hibernate ORM Panache -->
     <dependency>
       <groupId>io.quarkus</groupId>
