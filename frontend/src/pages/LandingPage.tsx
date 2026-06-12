@@ -63,16 +63,16 @@ export function LandingPage() {
         <div>
           <div className="inline-flex items-center gap-1.5 bg-brand-50 text-brand-700 text-xs font-semibold px-3 py-1.5 rounded-full mb-6 border border-brand-100">
             <span className="w-1.5 h-1.5 rounded-full bg-brand-500 animate-pulse" />
-            Ranking, XP, badges e notificações
+            Palpites com aposta de R$ 0 se o grupo quiser
           </div>
 
           <h1 className="text-4xl sm:text-5xl font-extrabold text-gray-900 leading-[1.1] mb-5">
             Bolão com amigos,<br />
-            <span className="text-brand-600">agora com jogo.</span>
+            <span className="text-brand-600">sem casa de aposta no meio.</span>
           </h1>
 
           <p className="text-lg text-gray-500 leading-relaxed mb-8 max-w-lg">
-            Crie grupos, convide por link, acompanhe feed, notificações, ranking por período, XP, níveis e conquistas. Tudo sem banca no meio.
+            Faça palpites, crie rankings e brinque com XP, badges e notificações. O valor pode ser R$ 0: a graça é juntar o grupo, não fazer alguém perder dinheiro.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3 mb-8">
@@ -86,7 +86,7 @@ export function LandingPage() {
           </div>
 
           <div className="flex flex-wrap items-center gap-4 text-sm text-gray-400">
-            {['Gratuito', 'Sem cartão', 'Convite por link', 'Funciona no celular'].map(t => (
+            {['Gratuito', 'Pode ser R$ 0', 'Sem cartão', 'Convite por link'].map(t => (
               <span key={t} className="flex items-center gap-1">
                 <Check className="w-3.5 h-3.5 text-brand-500 flex-shrink-0" />
                 {t}
@@ -125,8 +125,8 @@ export function LandingPage() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
             <FeatureCard
               icon={<Shield className="w-5 h-5 text-brand-600" />}
-              title="Dinheiro entre vocês"
-              description="100% do prêmio vai para o grupo. Nenhuma taxa, nenhuma banca no meio."
+              title="Pode ser R$ 0"
+              description="Seu grupo decide se vale dinheiro ou só diversão. O app funciona perfeitamente sem ninguém apostar um centavo."
             />
             <FeatureCard
               icon={<Trophy className="w-5 h-5 text-brand-600" />}
@@ -163,18 +163,18 @@ export function LandingPage() {
           <div>
             <p className="text-xs font-semibold uppercase tracking-wide text-brand-600 mb-3">Por que LocalBet?</p>
             <h2 className="text-3xl font-bold text-gray-900 leading-tight">
-              Do localhost à bet. Com uma ironia: aqui a ideia não é fazer você perder dinheiro.
+              Do localhost à bet. Com uma ironia: a melhor aposta aqui pode ser R$ 0.
             </h2>
           </div>
           <div>
             <p className="text-gray-500 leading-relaxed mb-6">
-              LocalBet nasceu da vontade de criar uma alternativa simples às plataformas de aposta: um bolão entre pessoas que se conhecem, sem banca tentando te prender. A proposta é tão direta que até seu avô consegue participar: cria a conta, cria o grupo e compartilha o link.
+              LocalBet nasceu como uma resposta simples às plataformas que ganham quando você perde. Aqui o centro é o grupo: família, amigos, firma, pelada de domingo. Se quiserem jogar valendo nada, ótimo. Se quiserem combinar prêmio entre vocês, também. O app só organiza o bolão.
             </p>
             <div className="grid sm:grid-cols-3 gap-3">
               {[
-                ['Sem cassino', 'O dinheiro e as regras ficam entre vocês. O app organiza o jogo, não joga contra o grupo.'],
-                ['Simples de entrar', 'Cadastro fácil, grupo criado em segundos e convite por link para ninguém se perder.'],
-                ['Família e amigos', 'Feito para o bolão da firma, da família ou do grupo do futebol, com ranking e diversão.'],
+                ['Sem cassino', 'Não tem banca, odds viciantes ou empurrão para gastar. Pode ser só palpite e ranking.'],
+                ['Até seu avô entra', 'Cria conta, entra no grupo pelo link e dá o palpite. Sem manual, sem complicação.'],
+                ['Diversão social', 'Feed, XP, badges e notificações existem para aproximar o grupo, não para drenar carteira.'],
               ].map(([title, description]) => (
                 <div key={title} className="rounded-lg border border-gray-200 bg-white p-4">
                   <p className="text-sm font-semibold text-gray-900 mb-1">{title}</p>
