@@ -552,6 +552,7 @@ function MatchCard({ match, groupId, isOwner, isSelected, onSelect }: {
 
   const myBet = bets?.find(b => b.user.id === user?.userId)
   const otherBets = bets?.filter(b => b.user.id !== user?.userId) ?? []
+  const betsOpen = match.status === 'SCHEDULED' && new Date() < new Date(match.matchDate)
 
   const statusLabel: Record<string, string> = { SCHEDULED: 'Agendada', IN_PROGRESS: 'Em andamento', FINISHED: 'Finalizada' }
 
@@ -676,7 +677,7 @@ function MatchCard({ match, groupId, isOwner, isSelected, onSelect }: {
                   )}
                   <span className="text-green-600 text-xs">Aposta registrada</span>
                 </div>
-              ) : (
+              ) : betsOpen ? (
                 <>
                   <form onSubmit={handleBet} className="flex flex-wrap items-center gap-2">
                     <input type="number" min="0" value={betHome} onChange={e => setBetHome(e.target.value)}
@@ -705,6 +706,11 @@ function MatchCard({ match, groupId, isOwner, isSelected, onSelect }: {
                   </form>
                   {betError && <p className="text-red-500 text-xs mt-1">{betError}</p>}
                 </>
+              ) : (
+                <div className="flex items-center gap-2 p-3 bg-orange-50 border border-orange-200 rounded-lg text-orange-700 text-sm">
+                  <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                  Apostas encerradas — a partida já começou
+                </div>
               )}
             </div>
           )}

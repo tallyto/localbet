@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Backend
+- Upgraded Quarkus from 3.17.4 → 3.36.2 (latest stable)
+- Fixed `L32X64MixRandom` error: replaced `@GeneratedValue` with `@UuidGenerator(style = Style.RANDOM)` on all 8 entities (`Bet`, `User`, `Championship`, `Group`, `BetResult`, `Round`, `Match`, `Sport`) — uses `UUID.randomUUID()` compatible with all Java versions
+- Bet validation: block new bets if match has already started (`matchDate` in the past) or status is `IN_PROGRESS`
+
 ### Frontend — UI Redesign
 
 #### Design System

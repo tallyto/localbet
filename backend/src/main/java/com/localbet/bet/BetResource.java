@@ -12,6 +12,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.eclipse.microprofile.jwt.JsonWebToken;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -36,8 +37,11 @@ public class BetResource {
         if (match == null) {
             return Response.status(404).entity("{\"error\":\"Partida não encontrada\"}").build();
         }
-        if ("FINISHED".equals(match.status)) {
+        if ("FINISHED".equals(match.status) || "IN_PROGRESS".equals(match.status)) {
             return Response.status(400).entity("{\"error\":\"Partida já encerrada\"}").build();
+        }
+        if (LocalDateTime.now().isAfter(match.matchDate)) {
+            return Response.status(400).entity("{\"error\":\"Apostas encerradas — a partida já começou\"}").build();
         }
 
         boolean alreadyBet = Bet.count(

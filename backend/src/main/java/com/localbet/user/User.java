@@ -3,6 +3,7 @@ package com.localbet.user;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UuidGenerator;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
@@ -12,7 +13,7 @@ import java.util.UUID;
 public class User extends PanacheEntityBase {
 
     @Id
-    @GeneratedValue
+    @UuidGenerator(style = UuidGenerator.Style.RANDOM)
     @Column(columnDefinition = "uuid")
     public UUID id;
 
