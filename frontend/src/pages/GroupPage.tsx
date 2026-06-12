@@ -150,6 +150,12 @@ export function GroupPage() {
             )}
           </div>
 
+          <GroupSummary
+            matches={matches ?? []}
+            championships={championships ?? []}
+            leaderboard={leaderboard ?? []}
+          />
+
           {showNewChampionship && (
             <NewChampionshipForm groupId={groupId} onClose={() => setShowNewChampionship(false)} />
           )}
@@ -413,6 +419,47 @@ function ActivityFeed({ items }: { items: ActivityItem[] }) {
           )
         })}
       </div>
+    </div>
+  )
+}
+
+function GroupSummary({ matches, championships, leaderboard }: {
+  matches: Match[]
+  championships: Championship[]
+  leaderboard: import('../types').LeaderboardEntry[]
+}) {
+  const finished = matches.filter(match => match.status === 'FINISHED').length
+  const scheduled = matches.filter(match => match.status === 'SCHEDULED').length
+  const inProgress = matches.filter(match => match.status === 'IN_PROGRESS').length
+  const activeChampionships = championships.filter(championship => championship.status !== 'CLOSED').length
+  const leader = leaderboard[0]
+
+  const items = [
+    { label: 'Jogos', value: matches.length },
+    { label: 'Finalizados', value: finished },
+    { label: 'Abertos', value: scheduled + inProgress },
+    { label: 'Campeonatos', value: activeChampionships },
+  ]
+
+  return (
+    <div className="mb-4 grid gap-2 sm:grid-cols-4">
+      {items.map(item => (
+        <div key={item.label} className="rounded-lg border border-gray-200 bg-white px-3 py-2">
+          <p className="text-[11px] uppercase tracking-wide text-gray-400 font-semibold">{item.label}</p>
+          <p className="text-lg font-bold text-gray-900">{item.value}</p>
+        </div>
+      ))}
+      {leader && (
+        <div className="rounded-lg border border-brand-100 bg-brand-50 px-3 py-2 sm:col-span-4">
+          <p className="text-[11px] uppercase tracking-wide text-brand-700 font-semibold">Líder atual</p>
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-0.5">
+            <p className="text-sm font-bold text-gray-900">{leader.userName}</p>
+            <p className="text-xs text-brand-700">{leader.totalPoints} pts</p>
+            <p className="text-xs text-brand-700">Nível {leader.level}</p>
+            <p className="text-xs text-brand-700">{leader.exactScores} exato{leader.exactScores !== 1 ? 's' : ''}</p>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
