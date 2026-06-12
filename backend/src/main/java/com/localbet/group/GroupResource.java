@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.UUID;
-import java.util.random.RandomGenerator;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Path("/groups")
 @Authenticated
@@ -234,7 +234,7 @@ public class GroupResource {
     private String generateCode() {
         String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         StringBuilder sb = new StringBuilder(8);
-        RandomGenerator rng = RandomGenerator.getDefault();
+        ThreadLocalRandom rng = ThreadLocalRandom.current();
         for (int i = 0; i < 8; i++) {
             sb.append(chars.charAt(rng.nextInt(chars.length())));
         }

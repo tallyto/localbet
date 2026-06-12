@@ -37,4 +37,4 @@ RUN chmod +x /app/docker-entrypoint.sh
 EXPOSE 8080
 
 ENTRYPOINT ["/app/docker-entrypoint.sh"]
-CMD ["java", "-jar", "quarkus-run.jar"]
+CMD ["java", "--add-modules", "ALL-SYSTEM", "-jar", "quarkus-run.jar"]
