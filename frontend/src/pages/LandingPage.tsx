@@ -157,8 +157,31 @@ export function LandingPage() {
         </div>
       </section>
 
+      {/* Origin */}
+      <section className="py-20 px-5 bg-gray-50 border-y border-gray-100">
+        <div className="max-w-5xl mx-auto grid lg:grid-cols-[0.9fr_1.1fr] gap-10 items-start">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wide text-brand-600 mb-3">Por que LocalBet?</p>
+            <h2 className="text-3xl font-bold text-gray-900 leading-tight">
+              Um localhost colocado em mar aberto.
+            </h2>
+          </div>
+          <div className="space-y-4 text-gray-500 leading-relaxed">
+            <p>
+              O nome nasceu da própria origem do projeto: uma ideia que começou local, em ambiente de desenvolvimento, e foi colocada em produção para sentir o mundo real.
+            </p>
+            <p>
+              O objetivo é simples: facilitar o cadastro, deixar pessoas entrarem sem atrito e observar como grupos reais se comportam criando bolões, convidando amigos, apostando, competindo e voltando para acompanhar os resultados.
+            </p>
+            <p className="text-sm text-gray-400">
+              LocalBet é esse experimento vivo: pequeno o suficiente para nascer de um localhost, aberto o suficiente para aprender com usuários de verdade.
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* How it works */}
-      <section className="py-20 px-5 bg-gray-50">
+      <section className="py-20 px-5">
         <div className="max-w-3xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900 mb-3">Como funciona</h2>
