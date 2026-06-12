@@ -59,7 +59,7 @@ export function LandingPage() {
       </nav>
 
       {/* Hero */}
-      <section className="max-w-6xl mx-auto px-5 pt-16 pb-12 grid lg:grid-cols-2 gap-10 items-center">
+      <section className="max-w-6xl mx-auto px-5 pt-16 pb-12 grid lg:grid-cols-[0.9fr_1.1fr] gap-10 items-center">
         <div>
           <div className="inline-flex items-center gap-1.5 bg-brand-50 text-brand-700 text-xs font-semibold px-3 py-1.5 rounded-full mb-6 border border-brand-100">
             <span className="w-1.5 h-1.5 rounded-full bg-brand-500 animate-pulse" />
@@ -267,8 +267,8 @@ export function LandingPage() {
 
 function AppMockup() {
   return (
-    <div className="relative select-none w-full max-w-[430px]">
-      <div className="absolute -left-8 -right-3 top-10 bottom-8 bg-brand-50 rounded-[2rem] -z-10" />
+    <div className="relative select-none w-full max-w-[620px]">
+      <div className="absolute -left-8 -right-4 top-8 bottom-8 bg-brand-50 rounded-[2rem] -z-10" />
 
       <div className="rounded-[1.35rem] overflow-hidden shadow-2xl border border-gray-200 bg-gray-50">
         {/* Browser chrome */}
@@ -283,93 +283,99 @@ function AppMockup() {
 
         {/* App UI */}
         <div className="p-3">
-        {/* Fake nav */}
-        <div className="flex items-center justify-between bg-white rounded-xl px-3 py-2 shadow-sm mb-3 border border-gray-100">
-          <div className="flex items-center gap-1.5">
-            <span className="w-5 h-5 rounded-md bg-brand-600 text-white text-[9px] font-bold flex items-center justify-center">L</span>
-            <span className="font-bold text-[11px] text-gray-900">LocalBet</span>
-            <span className="text-gray-300 text-[10px]">›</span>
-            <span className="text-[10px] text-gray-500">Copa 2026</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <span className="relative w-6 h-6 rounded-full bg-gray-100 text-gray-500 flex items-center justify-center">
-              <Bell className="w-3 h-3" />
-              <span className="absolute -top-0.5 -right-0.5 w-3 h-3 rounded-full bg-red-500 text-white text-[7px] leading-3 text-center font-bold">3</span>
-            </span>
-            <span className="w-6 h-6 rounded-full bg-brand-100 text-brand-700 text-[9px] font-bold flex items-center justify-center">JD</span>
-          </div>
-        </div>
-
-        {/* Tab bar */}
-        <div className="flex gap-0.5 mb-3 bg-gray-100 p-0.5 rounded-lg w-fit">
-          <span className="text-gray-500 text-[10px] font-medium px-3 py-1">Partidas</span>
-          <span className="text-gray-500 text-[10px] font-medium px-3 py-1">Ranking</span>
-          <span className="bg-white text-gray-900 shadow-sm text-[10px] font-medium px-3 py-1 rounded-md">Feed</span>
-        </div>
-
-        <div className="grid grid-cols-4 gap-1.5 mb-3">
-          {[
-            ['Jogos', '18'],
-            ['Finalizados', '9'],
-            ['Abertos', '7'],
-            ['Campeonatos', '2'],
-          ].map(([label, value]) => (
-            <div key={label} className="bg-white rounded-lg border border-gray-100 px-2 py-1.5">
-              <p className="text-[7px] uppercase text-gray-400 font-bold">{label}</p>
-              <p className="text-[12px] font-extrabold text-gray-900">{value}</p>
+          {/* Fake nav */}
+          <div className="flex items-center justify-between bg-white rounded-xl px-3 py-2 shadow-sm mb-3 border border-gray-100">
+            <div className="flex items-center gap-1.5">
+              <span className="w-5 h-5 rounded-md bg-brand-600 text-white text-[9px] font-bold flex items-center justify-center">L</span>
+              <span className="font-bold text-[11px] text-gray-900">LocalBet</span>
+              <span className="text-gray-300 text-[10px]">›</span>
+              <span className="text-[10px] text-gray-500">Copa 2026</span>
             </div>
-          ))}
-        </div>
-
-        {/* Ranking preview */}
-        <div className="mt-3 bg-white rounded-xl border border-gray-100 p-2.5">
-          <div className="flex items-center justify-between mb-2">
-            <p className="text-[10px] font-bold text-gray-500 uppercase tracking-wide">Ranking</p>
-            <span className="text-[8px] bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded">7 dias</span>
+            <div className="flex items-center gap-1.5">
+              <span className="relative w-6 h-6 rounded-full bg-gray-100 text-gray-500 flex items-center justify-center">
+                <Bell className="w-3 h-3" />
+                <span className="absolute -top-0.5 -right-0.5 w-3 h-3 rounded-full bg-red-500 text-white text-[7px] leading-3 text-center font-bold">3</span>
+              </span>
+              <span className="w-6 h-6 rounded-full bg-brand-100 text-brand-700 text-[9px] font-bold flex items-center justify-center">JD</span>
+            </div>
           </div>
-          <div className="space-y-2">
+
+          {/* Tab bar */}
+          <div className="flex gap-0.5 mb-3 bg-gray-100 p-0.5 rounded-lg w-fit">
+            <span className="text-gray-500 text-[10px] font-medium px-3 py-1">Partidas</span>
+            <span className="bg-white text-gray-900 shadow-sm text-[10px] font-medium px-3 py-1 rounded-md">Ranking</span>
+            <span className="text-gray-500 text-[10px] font-medium px-3 py-1">Feed</span>
+          </div>
+
+          <div className="grid grid-cols-4 gap-1.5 mb-3">
             {[
-              { pos: '🥇', name: 'João D.', pts: '37 pts', xp: '235 XP', badge: 'Na mosca', color: 'text-yellow-600' },
-              { pos: '🥈', name: 'Maria S.', pts: '28 pts', xp: '180 XP', badge: 'Nível 2', color: 'text-gray-500' },
-              { pos: '🥉', name: 'Pedro L.', pts: '21 pts', xp: '145 XP', badge: 'Fiel', color: 'text-orange-500' },
-            ].map(e => (
-              <div key={e.name} className="text-[10px]">
-                <div className="flex items-center justify-between">
-                  <span className="flex items-center gap-1.5">
-                    <span>{e.pos}</span>
-                    <span className="font-medium text-gray-700">{e.name}</span>
-                  </span>
-                  <span className={`font-bold ${e.color}`}>{e.pts}</span>
-                </div>
-                <div className="ml-5 mt-0.5 flex items-center gap-1.5">
-                  <span className="text-[8px] text-gray-400">{e.xp}</span>
-                  <span className="text-[8px] bg-brand-50 text-brand-700 border border-brand-100 rounded-full px-1.5 py-0.5">{e.badge}</span>
-                </div>
+              ['Jogos', '18'],
+              ['Finalizados', '9'],
+              ['Abertos', '7'],
+              ['Campeonatos', '2'],
+            ].map(([label, value]) => (
+              <div key={label} className="bg-white rounded-lg border border-gray-100 px-2 py-1.5">
+                <p className="text-[7px] uppercase text-gray-400 font-bold">{label}</p>
+                <p className="text-[12px] font-extrabold text-gray-900">{value}</p>
               </div>
             ))}
           </div>
-        </div>
 
-        <div className="mt-3 bg-white rounded-xl border border-gray-100 p-2.5">
-          <p className="text-[10px] font-bold text-gray-500 uppercase tracking-wide mb-2">Feed</p>
-          <div className="space-y-2">
-            {[
-              ['João desbloqueou Mão cirúrgica', '3 placares exatos no grupo.'],
-              ['Brasil 2 x 1 Argentina', 'Partida finalizada · Rodada 2'],
-              ['Maria entrou no pódio', 'Subiu para o 2º lugar.'],
-            ].map(([title, desc]) => (
-              <div key={title} className="flex gap-2">
-                <span className="w-6 h-6 rounded-md bg-blue-50 text-blue-700 flex items-center justify-center flex-shrink-0">
-                  <Activity className="w-3 h-3" />
-                </span>
-                <span className="min-w-0">
-                  <span className="block text-[9px] font-semibold text-gray-800 truncate">{title}</span>
-                  <span className="block text-[8px] text-gray-400 truncate">{desc}</span>
-                </span>
+          <div className="grid grid-cols-[1.1fr_0.9fr] gap-3">
+            {/* Ranking preview */}
+            <div className="bg-white rounded-xl border border-gray-100 p-2.5">
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-[10px] font-bold text-gray-500 uppercase tracking-wide">Ranking</p>
+                <span className="text-[8px] bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded">7 dias</span>
               </div>
-            ))}
+              <div className="space-y-2">
+                {[
+                  { pos: '🥇', name: 'João D.', pts: '37 pts', xp: '235 XP', badge: 'Na mosca', color: 'text-yellow-600' },
+                  { pos: '🥈', name: 'Maria S.', pts: '28 pts', xp: '180 XP', badge: 'Nível 2', color: 'text-gray-500' },
+                  { pos: '🥉', name: 'Pedro L.', pts: '21 pts', xp: '145 XP', badge: 'Fiel', color: 'text-orange-500' },
+                ].map(e => (
+                  <div key={e.name} className="text-[10px]">
+                    <div className="flex items-center justify-between">
+                      <span className="flex items-center gap-1.5">
+                        <span>{e.pos}</span>
+                        <span className="font-medium text-gray-700">{e.name}</span>
+                      </span>
+                      <span className={`font-bold ${e.color}`}>{e.pts}</span>
+                    </div>
+                    <div className="ml-5 mt-0.5 flex items-center gap-1.5">
+                      <span className="text-[8px] text-gray-400">{e.xp}</span>
+                      <span className="text-[8px] bg-brand-50 text-brand-700 border border-brand-100 rounded-full px-1.5 py-0.5">{e.badge}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="bg-white rounded-xl border border-gray-100 p-2.5">
+              <p className="text-[10px] font-bold text-gray-500 uppercase tracking-wide mb-2">Feed</p>
+              <div className="space-y-2">
+                {[
+                  ['João desbloqueou Mão cirúrgica', '3 placares exatos no grupo.'],
+                  ['Brasil 2 x 1 Argentina', 'Partida finalizada · Rodada 2'],
+                  ['Maria entrou no pódio', 'Subiu para o 2º lugar.'],
+                ].map(([title, desc]) => (
+                  <div key={title} className="flex gap-2">
+                    <span className="w-6 h-6 rounded-md bg-blue-50 text-blue-700 flex items-center justify-center flex-shrink-0">
+                      <Activity className="w-3 h-3" />
+                    </span>
+                    <span className="min-w-0">
+                      <span className="block text-[9px] font-semibold text-gray-800 truncate">{title}</span>
+                      <span className="block text-[8px] text-gray-400 truncate">{desc}</span>
+                    </span>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-3 rounded-lg bg-brand-50 border border-brand-100 p-2">
+                <p className="text-[9px] font-semibold text-brand-700">Aposta de R$ 0</p>
+                <p className="text-[8px] text-brand-700/70 mt-0.5">Palpite social sem casa de aposta.</p>
+              </div>
+            </div>
           </div>
-        </div>
         </div>
       </div>
     </div>
