@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Layout } from '../components/Layout'
 import { useAuth } from '../context/AuthContext'
@@ -7,10 +7,29 @@ import { useDeleteGroup, useMyGroups } from '../hooks/useGroups'
 import { Group } from '../types'
 import { ConfirmDialog } from '../components/ConfirmDialog'
 import { usePageTitle } from '../hooks/usePageTitle'
+import { Check, Eye, EyeOff } from 'lucide-react'
 
 export function AccountPage() {
-  const { user, logout } = useAuth()
+  const { user, logout, updateProfile } = useAuth()
   const navigate = useNavigate()
+
+  // Edit name
+  const [name, setName] = useState(user?.name ?? '')
+  const [nameSuccess, setNameSuccess] = useState(false)
+  const [nameError, setNameError] = useState('')
+  const [nameLoading, setNameLoading] = useState(false)
+
+  // Change password
+  const [currentPassword, setCurrentPassword] = useState('')
+  const [newPassword, setNewPassword] = useState('')
+  const [confirmNewPassword, setConfirmNewPassword] = useState('')
+  const [showCurrentPw, setShowCurrentPw] = useState(false)
+  const [showNewPw, setShowNewPw] = useState(false)
+  const [pwSuccess, setPwSuccess] = useState(false)
+  const [pwError, setPwError] = useState('')
+  const [pwLoading, setPwLoading] = useState(false)
+
+  // Delete account
   const [confirm, setConfirm] = useState('')
   const [error, setError] = useState('')
   const [groupError, setGroupError] = useState('')
@@ -20,6 +39,46 @@ export function AccountPage() {
   const [showDanger, setShowDanger] = useState(false)
   const { data: groups = [] } = useMyGroups()
   const deleteGroup = useDeleteGroup()
+
+  async function handleUpdateName(e: FormEvent) {
+    e.preventDefault()
+    if (!name.trim() || name.trim() === user?.name) return
+    setNameLoading(true)
+    setNameError('')
+    setNameSuccess(false)
+    try {
+      await updateProfile({ name: name.trim() })
+      setNameSuccess(true)
+      setTimeout(() => setNameSuccess(false), 3000)
+    } catch (err: any) {
+      setNameError(err.response?.data?.error ?? 'Erro ao atualizar nome')
+    } finally {
+      setNameLoading(false)
+    }
+  }
+
+  async function handleUpdatePassword(e: FormEvent) {
+    e.preventDefault()
+    if (newPassword !== confirmNewPassword) {
+      setPwError('As senhas não coincidem')
+      return
+    }
+    setPwLoading(true)
+    setPwError('')
+    setPwSuccess(false)
+    try {
+      await updateProfile({ currentPassword, newPassword })
+      setPwSuccess(true)
+      setCurrentPassword('')
+      setNewPassword('')
+      setConfirmNewPassword('')
+      setTimeout(() => setPwSuccess(false), 3000)
+    } catch (err: any) {
+      setPwError(err.response?.data?.error ?? 'Erro ao alterar senha')
+    } finally {
+      setPwLoading(false)
+    }
+  }
 
   usePageTitle('Minha conta')
   const confirmWord = user?.name ?? ''
@@ -64,19 +123,104 @@ export function AccountPage() {
           <p className="text-sm text-gray-400 mt-0.5">Gerencie suas informações pessoais</p>
         </div>
 
-        {/* User info */}
-        <div className="bg-white rounded-xl border border-gray-200 p-5 space-y-3">
+        {/* Edit name */}
+        <div className="bg-white rounded-xl border border-gray-200 p-5 space-y-4">
           <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Informações</p>
-          <div className="space-y-2">
+          <form onSubmit={handleUpdateName} className="space-y-3" aria-label="Editar nome">
             <div>
-              <p className="text-xs text-gray-400">Nome</p>
-              <p className="text-sm font-medium text-gray-800">{user?.name}</p>
+              <label htmlFor="account-name" className="block text-xs font-medium text-gray-600 mb-1">Nome</label>
+              <input
+                id="account-name"
+                value={name}
+                onChange={e => setName(e.target.value)}
+                className="input-base"
+                required
+                minLength={2}
+                maxLength={100}
+              />
             </div>
             <div>
-              <p className="text-xs text-gray-400">E-mail</p>
-              <p className="text-sm font-medium text-gray-800">{user?.email}</p>
+              <p className="text-xs text-gray-400 mb-0.5">E-mail</p>
+              <p className="text-sm text-gray-500">{user?.email}</p>
             </div>
-          </div>
+            {nameError && <p role="alert" className="text-xs text-red-500">{nameError}</p>}
+            <button
+              type="submit"
+              disabled={nameLoading || !name.trim() || name.trim() === user?.name}
+              className="btn-primary text-xs px-4 py-2 flex items-center gap-1.5 disabled:opacity-40"
+            >
+              {nameSuccess && <Check aria-hidden="true" className="w-3.5 h-3.5" />}
+              {nameLoading ? 'Salvando...' : nameSuccess ? 'Salvo!' : 'Salvar nome'}
+            </button>
+          </form>
+        </div>
+
+        {/* Change password */}
+        <div className="bg-white rounded-xl border border-gray-200 p-5 space-y-4">
+          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Alterar senha</p>
+          <form onSubmit={handleUpdatePassword} className="space-y-3" aria-label="Alterar senha">
+            <div>
+              <label htmlFor="account-current-pw" className="block text-xs font-medium text-gray-600 mb-1">Senha atual</label>
+              <div className="relative">
+                <input
+                  id="account-current-pw"
+                  type={showCurrentPw ? 'text' : 'password'}
+                  value={currentPassword}
+                  onChange={e => setCurrentPassword(e.target.value)}
+                  className="input-base pr-10"
+                  required
+                  autoComplete="current-password"
+                />
+                <button type="button" tabIndex={-1} onClick={() => setShowCurrentPw(v => !v)}
+                  aria-label={showCurrentPw ? 'Ocultar senha atual' : 'Mostrar senha atual'}
+                  className="absolute inset-y-0 right-3 flex items-center text-gray-400 hover:text-gray-600">
+                  {showCurrentPw ? <EyeOff aria-hidden="true" className="w-4 h-4" /> : <Eye aria-hidden="true" className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
+            <div>
+              <label htmlFor="account-new-pw" className="block text-xs font-medium text-gray-600 mb-1">Nova senha</label>
+              <div className="relative">
+                <input
+                  id="account-new-pw"
+                  type={showNewPw ? 'text' : 'password'}
+                  value={newPassword}
+                  onChange={e => setNewPassword(e.target.value)}
+                  className="input-base pr-10"
+                  required
+                  minLength={6}
+                  autoComplete="new-password"
+                />
+                <button type="button" tabIndex={-1} onClick={() => setShowNewPw(v => !v)}
+                  aria-label={showNewPw ? 'Ocultar nova senha' : 'Mostrar nova senha'}
+                  className="absolute inset-y-0 right-3 flex items-center text-gray-400 hover:text-gray-600">
+                  {showNewPw ? <EyeOff aria-hidden="true" className="w-4 h-4" /> : <Eye aria-hidden="true" className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
+            <div>
+              <label htmlFor="account-confirm-pw" className="block text-xs font-medium text-gray-600 mb-1">Confirmar nova senha</label>
+              <input
+                id="account-confirm-pw"
+                type="password"
+                value={confirmNewPassword}
+                onChange={e => setConfirmNewPassword(e.target.value)}
+                className="input-base"
+                required
+                minLength={6}
+                autoComplete="new-password"
+              />
+            </div>
+            {pwError && <p role="alert" className="text-xs text-red-500">{pwError}</p>}
+            <button
+              type="submit"
+              disabled={pwLoading}
+              className="btn-primary text-xs px-4 py-2 flex items-center gap-1.5 disabled:opacity-40"
+            >
+              {pwSuccess && <Check aria-hidden="true" className="w-3.5 h-3.5" />}
+              {pwLoading ? 'Alterando...' : pwSuccess ? 'Senha alterada!' : 'Alterar senha'}
+            </button>
+          </form>
         </div>
 
         {/* Danger zone */}

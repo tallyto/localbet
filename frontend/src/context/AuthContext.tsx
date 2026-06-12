@@ -13,6 +13,7 @@ interface AuthContextType {
   token: string | null
   login: (email: string, password: string) => Promise<void>
   register: (name: string, email: string, password: string, acceptedTerms: boolean) => Promise<void>
+  updateProfile: (data: { name?: string; currentPassword?: string; newPassword?: string }) => Promise<void>
   logout: () => void
   isAuthenticated: boolean
 }
@@ -56,6 +57,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser({ userId, name, email })
   }
 
+  const updateProfile = async (data: { name?: string; currentPassword?: string; newPassword?: string }) => {
+    const res = await api.put('/auth/me', data)
+    const { name: newName, email } = res.data
+    const updated = { userId: user!.userId, name: newName, email }
+    localStorage.setItem('user', JSON.stringify(updated))
+    setUser(updated)
+  }
+
   const logout = () => {
     queryClient.clear()
     localStorage.removeItem('token')
@@ -65,7 +74,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, token, login, register, logout, isAuthenticated: !!token }}>
+    <AuthContext.Provider value={{ user, token, login, register, updateProfile, logout, isAuthenticated: !!token }}>
       {children}
     </AuthContext.Provider>
   )

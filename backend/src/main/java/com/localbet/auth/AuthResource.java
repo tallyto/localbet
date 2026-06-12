@@ -87,6 +87,31 @@ public class AuthResource {
         return Response.noContent().build();
     }
 
+    @PUT
+    @Path("/me")
+    @Authenticated
+    @Transactional
+    public Response updateMe(AuthRequest.UpdateProfile req) {
+        UUID userId = UUID.fromString(jwt.getSubject());
+        User user = User.findById(userId);
+        if (user == null) return Response.status(404).build();
+
+        if (req.name != null && !req.name.isBlank()) {
+            user.name = req.name.trim();
+        }
+
+        if (req.newPassword != null && !req.newPassword.isBlank()) {
+            if (req.currentPassword == null || !BcryptUtil.matches(req.currentPassword, user.passwordHash)) {
+                return Response.status(Response.Status.BAD_REQUEST)
+                        .entity("{\"error\":\"Senha atual incorreta\"}")
+                        .build();
+            }
+            user.passwordHash = BcryptUtil.bcryptHash(req.newPassword);
+        }
+
+        return Response.ok(new AuthResponse(null, user.id, user.name, user.email)).build();
+    }
+
     @POST
     @Path("/login")
     public Response login(@Valid AuthRequest.Login req) {

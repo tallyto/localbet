@@ -34,4 +34,14 @@ public class AuthRequest {
         @NotBlank
         public String password;
     }
+
+    public static class UpdateProfile {
+        @Size(min = 2, max = 100)
+        public String name;
+
+        public String currentPassword;
+
+        @Size(min = 6)
+        public String newPassword;
+    }
 }
