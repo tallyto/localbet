@@ -25,6 +25,19 @@ export function useJoinGroup() {
   })
 }
 
+export function useDeleteGroup() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (groupId: string) => api.delete(`/groups/${groupId}`),
+    onSuccess: (_, groupId) => {
+      qc.invalidateQueries({ queryKey: ['groups'] })
+      qc.removeQueries({ queryKey: ['group', groupId] })
+      qc.removeQueries({ queryKey: ['group-members', groupId] })
+      qc.invalidateQueries({ queryKey: ['leaderboard'] })
+    }
+  })
+}
+
 export function useGroup(groupId: string) {
   return useQuery<Group>({
     queryKey: ['group', groupId],

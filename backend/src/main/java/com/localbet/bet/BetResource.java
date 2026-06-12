@@ -1,5 +1,6 @@
 package com.localbet.bet;
 
+import com.localbet.calculation.BetCalculationService;
 import com.localbet.group.Group;
 import com.localbet.sport.Match;
 import com.localbet.user.User;
@@ -22,6 +23,9 @@ public class BetResource {
 
     @Inject
     JsonWebToken jwt;
+
+    @Inject
+    BetCalculationService calculationService;
 
     @POST
     @Transactional
@@ -61,9 +65,18 @@ public class BetResource {
 
     @GET
     @Path("/group/{groupId}/match/{matchId}")
+    @Transactional
     public List<Bet> betsByGroupAndMatch(
             @PathParam("groupId") UUID groupId,
             @PathParam("matchId") UUID matchId) {
+        Match match = Match.findById(matchId);
+        if (match != null
+                && match.championship != null
+                && "CHAMPIONSHIP".equals(match.championship.betScope)
+                && "CLOSED".equals(match.championship.status)) {
+            calculationService.calculateChampionshipWinnings(match.championship);
+        }
+
         return Bet.findByGroupAndMatch(groupId, matchId);
     }
 

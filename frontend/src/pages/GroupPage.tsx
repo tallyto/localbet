@@ -2,11 +2,13 @@ import { useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { Layout } from '../components/Layout'
 import { useGroupMatches, useCreateMatch, useSetScore, useUpdateScore, useDeleteMatch, useSports } from '../hooks/useMatches'
-import { useGroupChampionships, useCreateChampionship, useCloseChampionship, useChampionshipRounds, useCreateRound, useDeleteRound } from '../hooks/useChampionships'
+import { useGroupChampionships, useCreateChampionship, useCloseChampionship, useChampionshipRounds, useCreateRound, useDeleteRound, useDeleteChampionship } from '../hooks/useChampionships'
 import { useGroupMatchBets, usePlaceBet } from '../hooks/useBets'
 import { useLeaderboard, useMyRole, useGroup } from '../hooks/useGroups'
 import { useAuth } from '../context/AuthContext'
-import { Match } from '../types'
+import { Championship, Match } from '../types'
+import { ConfirmDialog } from '../components/ConfirmDialog'
+import { DateTimePicker } from '../components/DateTimePicker'
 
 function Tooltip({ children, content }: { children: React.ReactNode; content: React.ReactNode }) {
   return (
@@ -43,6 +45,9 @@ const EXACT_ONLY_TOOLTIP = (
     <p className="text-gray-300 mt-1">Se ninguém acertar o exato, cada um recebe o que apostou de volta.</p>
   </div>
 )
+
+const formatCurrency = (value: number) =>
+  value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
 
 export function GroupPage() {
   const { groupId } = useParams<{ groupId: string }>()
@@ -120,10 +125,10 @@ export function GroupPage() {
 
           {isLoading ? (
             <div className="text-center py-8 text-gray-400">Carregando...</div>
-          ) : matches?.length === 0 ? (
-            <p className="text-center py-8 text-gray-400">Nenhuma partida cadastrada ainda.</p>
+          ) : matches?.length === 0 && championships?.length === 0 ? (
+            <p className="text-center py-8 text-gray-400">Nenhuma partida ou campeonato cadastrado ainda.</p>
           ) : (
-            <MatchList matches={matches ?? []} groupId={groupId} isOwner={isOwner} />
+            <MatchList matches={matches ?? []} championships={championships ?? []} groupId={groupId} isOwner={isOwner} />
           )}
         </div>
       )}
@@ -210,17 +215,52 @@ export function GroupPage() {
 }
 
 function ChampionshipHeader({ championship, isOwner }: {
-  championship: NonNullable<Match['championship']> & { scoringMode?: string; betScope?: string; status?: string; defaultBetAmount?: number }
+  championship: Championship
   isOwner: boolean
 }) {
   const closeChampionship = useCloseChampionship()
+  const deleteChampionship = useDeleteChampionship()
   const deleteRound = useDeleteRound()
   const { data: rounds } = useChampionshipRounds(championship.id)
   const [showRounds, setShowRounds] = useState(false)
   const [roundError, setRoundError] = useState('')
+  const [championshipError, setChampionshipError] = useState('')
+  const [confirmAction, setConfirmAction] = useState<'close' | 'deleteChampionship' | null>(null)
+  const [roundToDelete, setRoundToDelete] = useState<{ id: string; name: string } | null>(null)
   const isClosed = championship.status === 'CLOSED'
   const isChampScope = championship.betScope === 'CHAMPIONSHIP'
   const isExactOnly = championship.scoringMode === 'EXACT_ONLY'
+
+  async function handleCloseChampionship() {
+    setChampionshipError('')
+    try {
+      await closeChampionship.mutateAsync(championship.id)
+      setConfirmAction(null)
+    } catch (err: any) {
+      setChampionshipError(err.response?.data?.error ?? 'Erro ao encerrar campeonato')
+    }
+  }
+
+  async function handleDeleteChampionship() {
+    setChampionshipError('')
+    try {
+      await deleteChampionship.mutateAsync({ championshipId: championship.id })
+      setConfirmAction(null)
+    } catch (err: any) {
+      setChampionshipError(err.response?.data?.error ?? 'Erro ao remover campeonato')
+    }
+  }
+
+  async function handleDeleteRound() {
+    if (!roundToDelete) return
+    setRoundError('')
+    try {
+      await deleteRound.mutateAsync({ championshipId: championship.id, roundId: roundToDelete.id })
+      setRoundToDelete(null)
+    } catch (err: any) {
+      setRoundError(err.response?.data?.error ?? 'Erro ao remover rodada')
+    }
+  }
 
   return (
     <>
@@ -239,19 +279,25 @@ function ChampionshipHeader({ championship, isOwner }: {
         <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
           isClosed ? 'bg-gray-100 text-gray-500' : 'bg-orange-50 text-orange-700'
         }`}>
-          {isClosed ? 'Encerrado' : 'Pool total'}
+          {isClosed ? 'Encerrado' : 'Prêmio acumulado'}
         </span>
       )}
       {isOwner && isChampScope && !isClosed && (
         <button
-          onClick={() => {
-            if (!confirm(`Encerrar "${championship.name}" e distribuir o prêmio acumulado?`)) return
-            closeChampionship.mutate(championship.id)
-          }}
+          onClick={() => setConfirmAction('close')}
           disabled={closeChampionship.isPending}
           className="text-xs px-2 py-0.5 rounded-full bg-red-50 text-red-600 border border-red-200 hover:bg-red-100 disabled:opacity-60"
         >
           Encerrar campeonato
+        </button>
+      )}
+      {isOwner && (
+        <button
+          onClick={() => setConfirmAction('deleteChampionship')}
+          disabled={deleteChampionship.isPending}
+          className="text-xs px-2 py-0.5 rounded-full bg-gray-50 text-gray-500 border border-gray-200 hover:text-red-600 hover:border-red-200 hover:bg-red-50 disabled:opacity-60"
+        >
+          Remover campeonato
         </button>
       )}
       {isOwner && rounds && rounds.length > 0 && (
@@ -264,21 +310,17 @@ function ChampionshipHeader({ championship, isOwner }: {
       )}
     </div>
 
+    {championshipError && (
+      <p className="text-xs text-red-500 mb-2">{championshipError}</p>
+    )}
+
     {isOwner && showRounds && rounds && rounds.length > 0 && (
       <div className="mb-3 ml-2 flex flex-wrap gap-2">
         {rounds.map(r => (
           <span key={r.id} className="inline-flex items-center gap-1 text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">
             {r.name}
             <button
-              onClick={async () => {
-                if (!confirm(`Remover rodada "${r.name}"?`)) return
-                setRoundError('')
-                try {
-                  await deleteRound.mutateAsync({ championshipId: championship.id, roundId: r.id })
-                } catch (err: any) {
-                  setRoundError(err.response?.data?.error ?? 'Erro ao remover rodada')
-                }
-              }}
+              onClick={() => setRoundToDelete({ id: r.id, name: r.name })}
               disabled={deleteRound.isPending}
               className="text-gray-400 hover:text-red-500 font-bold leading-none disabled:opacity-50"
               title="Remover rodada"
@@ -292,11 +334,43 @@ function ChampionshipHeader({ championship, isOwner }: {
         )}
       </div>
     )}
+    <ConfirmDialog
+      open={confirmAction === 'close'}
+      title="Encerrar campeonato"
+      description={`Encerrar "${championship.name}" e distribuir o prêmio acumulado?`}
+      confirmLabel="Encerrar"
+      loading={closeChampionship.isPending}
+      onConfirm={handleCloseChampionship}
+      onCancel={() => setConfirmAction(null)}
+    />
+    <ConfirmDialog
+      open={confirmAction === 'deleteChampionship'}
+      title="Remover campeonato"
+      description={`Remover "${championship.name}" e todos os jogos dele? Esta ação não pode ser desfeita.`}
+      confirmLabel="Remover"
+      loading={deleteChampionship.isPending}
+      onConfirm={handleDeleteChampionship}
+      onCancel={() => setConfirmAction(null)}
+    />
+    <ConfirmDialog
+      open={!!roundToDelete}
+      title="Remover rodada"
+      description={`Remover rodada "${roundToDelete?.name ?? ''}" e todos os jogos dela? Esta ação não pode ser desfeita.`}
+      confirmLabel="Remover"
+      loading={deleteRound.isPending}
+      onConfirm={handleDeleteRound}
+      onCancel={() => setRoundToDelete(null)}
+    />
     </>
   )
 }
 
-function MatchList({ matches, groupId, isOwner }: { matches: Match[]; groupId: string; isOwner: boolean }) {
+function MatchList({ matches, championships, groupId, isOwner }: {
+  matches: Match[]
+  championships: Championship[]
+  groupId: string
+  isOwner: boolean
+}) {
   const [selectedMatchId, setSelectedMatchId] = useState<string | null>(null)
 
   // Separar partidas com e sem campeonato
@@ -305,23 +379,29 @@ function MatchList({ matches, groupId, isOwner }: { matches: Match[]; groupId: s
 
   // Agrupar por campeonato, depois por round.id (não por nome, para evitar duplicatas)
   type RoundGroup = { roundId: string; roundName: string; orderNum?: number; matches: Match[] }
-  const byChampionship = withChampionship.reduce<Record<string, { championship: NonNullable<Match['championship']>; rounds: Record<string, RoundGroup> }>>((acc, match) => {
-    const cId = match.championship!.id
-    if (!acc[cId]) acc[cId] = { championship: match.championship!, rounds: {} }
-    const roundId = match.round?.id ?? 'no-round'
-    const roundName = match.round?.name ?? 'Sem rodada'
-    if (!acc[cId].rounds[roundId]) acc[cId].rounds[roundId] = { roundId, roundName, orderNum: match.round?.orderNum, matches: [] }
-    acc[cId].rounds[roundId].matches.push(match)
+  const byChampionship = championships.reduce<Record<string, { championship: Championship; rounds: Record<string, RoundGroup> }>>((acc, championship) => {
+    acc[championship.id] = { championship, rounds: {} }
     return acc
   }, {})
+
+  withChampionship.forEach(match => {
+    const cId = match.championship!.id
+    if (!byChampionship[cId]) byChampionship[cId] = { championship: match.championship!, rounds: {} }
+    const roundId = match.round?.id ?? 'no-round'
+    const roundName = match.round?.name ?? 'Sem rodada'
+    if (!byChampionship[cId].rounds[roundId]) byChampionship[cId].rounds[roundId] = { roundId, roundName, orderNum: match.round?.orderNum, matches: [] }
+    byChampionship[cId].rounds[roundId].matches.push(match)
+  })
 
   return (
     <div className="space-y-6">
       {Object.values(byChampionship).map(({ championship, rounds }) => (
         <div key={championship.id}>
-          <ChampionshipHeader championship={championship as any} isOwner={isOwner} />
+          <ChampionshipHeader championship={championship} isOwner={isOwner} />
           <div className="space-y-4 pl-2 border-l-2 border-green-100">
-            {Object.values(rounds)
+            {Object.keys(rounds).length === 0 ? (
+              <p className="text-xs text-gray-400 py-2">Nenhum jogo neste campeonato.</p>
+            ) : Object.values(rounds)
               .sort((a, b) => (a.orderNum ?? 9999) - (b.orderNum ?? 9999))
               .map(({ roundId, roundName, matches: roundMatches }) => (
               <div key={roundId}>
@@ -384,6 +464,7 @@ function MatchCard({ match, groupId, isOwner, isSelected, onSelect }: {
   const [scoreAway, setScoreAway] = useState(match.awayScore?.toString() ?? '')
   const [editingScore, setEditingScore] = useState(false)
   const [betError, setBetError] = useState('')
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
 
   const myBet = bets?.find(b => b.user.id === user?.userId)
   const otherBets = bets?.filter(b => b.user.id !== user?.userId) ?? []
@@ -392,8 +473,12 @@ function MatchCard({ match, groupId, isOwner, isSelected, onSelect }: {
 
   async function handleDelete(e: React.MouseEvent) {
     e.stopPropagation()
-    if (!confirm(`Excluir ${match.homeTeam} x ${match.awayTeam}? Todas as apostas serão removidas.`)) return
+    setShowDeleteConfirm(true)
+  }
+
+  async function confirmDeleteMatch() {
     await deleteMatch.mutateAsync({ matchId: match.id, groupId })
+    setShowDeleteConfirm(false)
   }
 
   async function handleUpdateScore(e: React.FormEvent) {
@@ -484,7 +569,7 @@ function MatchCard({ match, groupId, isOwner, isSelected, onSelect }: {
                   </span>
                   {myBet.amount > 0 && (
                     <span className="text-green-600 text-xs font-medium">
-                      R$ {myBet.amount.toFixed(2)}
+                      {formatCurrency(myBet.amount)}
                     </span>
                   )}
                   <span className="text-green-600 text-xs">Aposta registrada</span>
@@ -610,11 +695,11 @@ function MatchCard({ match, groupId, isOwner, isSelected, onSelect }: {
                       </div>
                       {hasAmount && (
                         <div className="flex items-center justify-between mt-1.5 text-xs">
-                          <span className="text-gray-400">Apostou R$ {(bet.amount).toFixed(2)}</span>
+                          <span className="text-gray-400">Apostou {formatCurrency(bet.amount)}</span>
                           {winnings !== null && (
                             <span className={`font-semibold ${net !== null && net >= 0 ? 'text-green-600' : 'text-red-500'}`}>
                               {winnings > 0
-                                ? `Ganhou R$ ${winnings.toFixed(2)}${net !== null ? ` (${net >= 0 ? '+' : ''}R$ ${net.toFixed(2)})` : ''}`
+                                ? `Ganhou ${formatCurrency(winnings)}${net !== null ? ` (${net >= 0 ? '+' : ''}${formatCurrency(net)})` : ''}`
                                 : 'Sem ganhos'
                               }
                             </span>
@@ -634,11 +719,11 @@ function MatchCard({ match, groupId, isOwner, isSelected, onSelect }: {
                     <div className="pt-1">
                       {isChampScope && !isClosed ? (
                         <p className="text-xs text-orange-500 text-right">
-                          Pool acumulado no campeonato — ganhos ao encerrar
+                          Prêmio acumulado no campeonato — ganhos ao encerrar
                         </p>
                       ) : (
                         <p className="text-xs text-gray-400 text-right flex items-center justify-end gap-1">
-                          Prêmio da partida: R$ {pool.toFixed(2)}
+                          Prêmio da partida: {formatCurrency(pool)}
                           <Tooltip content={isExactOnly ? EXACT_ONLY_TOOLTIP : SCORING_RULES_TOOLTIP}>
                             <span className="text-gray-300 cursor-help">ⓘ</span>
                           </Tooltip>
@@ -659,6 +744,15 @@ function MatchCard({ match, groupId, isOwner, isSelected, onSelect }: {
           )}
         </div>
       )}
+      <ConfirmDialog
+        open={showDeleteConfirm}
+        title="Excluir partida"
+        description={`Excluir ${match.homeTeam} x ${match.awayTeam}? Todas as apostas serão removidas.`}
+        confirmLabel="Excluir"
+        loading={deleteMatch.isPending}
+        onConfirm={confirmDeleteMatch}
+        onCancel={() => setShowDeleteConfirm(false)}
+      />
     </div>
   )
 }
@@ -781,8 +875,11 @@ function NewMatchForm({ groupId, championships, onClose }: {
         <input value={form.awayTeam} onChange={e => setForm(f => ({ ...f, awayTeam: e.target.value }))}
           placeholder="Time visitante" className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500" required />
       </div>
-      <input type="datetime-local" value={form.matchDate} onChange={e => setForm(f => ({ ...f, matchDate: e.target.value }))}
-        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500" required />
+      <DateTimePicker
+        value={form.matchDate}
+        onChange={matchDate => setForm(f => ({ ...f, matchDate }))}
+        required
+      />
       <div className="flex gap-2">
         <button type="submit" disabled={createMatch.isPending || createRound.isPending}
           className="px-4 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 disabled:opacity-60">
@@ -823,7 +920,7 @@ function NewChampionshipForm({ groupId, onClose }: { groupId: string; onClose: (
     <form onSubmit={handleSubmit} className="mb-4 p-4 bg-white rounded-xl border border-green-200 space-y-3">
       <h3 className="font-medium text-gray-800 text-sm">Novo Campeonato</h3>
       <input value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
-        placeholder="Nome (ex: Premier League, Copa do Mundo)" required
+        placeholder="Nome (ex: Série A, Copa do Mundo)" required
         className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
       <div className="flex gap-2">
         <input value={form.season} onChange={e => setForm(f => ({ ...f, season: e.target.value }))}
@@ -853,7 +950,7 @@ function NewChampionshipForm({ groupId, onClose }: { groupId: string; onClose: (
         </div>
 
         <div>
-          <label className="text-xs text-gray-500 mb-1 block">Pool do prêmio</label>
+          <label className="text-xs text-gray-500 mb-1 block">Prêmio</label>
           <select value={form.betScope} onChange={e => setForm(f => ({ ...f, betScope: e.target.value }))}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 bg-white">
             <option value="MATCH">Por jogo (prêmio distribuído ao final de cada partida)</option>

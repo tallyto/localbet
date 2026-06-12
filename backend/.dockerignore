@@ -1,0 +1,11 @@
+target/
+.quarkus/
+.mvn/wrapper/maven-wrapper.jar
+
+*.log
+hs_err_pid*
+replay_pid*
+
+.git/
+.gitignore
+.dockerignore

@@ -1,5 +1,6 @@
 package com.localbet.group;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.localbet.user.User;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.*;
@@ -31,6 +32,11 @@ public class Group extends PanacheEntityBase {
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     public LocalDateTime createdAt;
+
+    @JsonProperty("ownerId")
+    public UUID getOwnerId() {
+        return owner != null ? owner.id : null;
+    }
 
     public static Optional<Group> findByInviteCode(String code) {
         return find("inviteCode", code).firstResultOptional();

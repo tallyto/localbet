@@ -51,6 +51,23 @@ export function useDeleteRound() {
     onSuccess: (_data, vars) => {
       qc.invalidateQueries({ queryKey: ['rounds', vars.championshipId] })
       qc.invalidateQueries({ queryKey: ['matches'] })
+      qc.invalidateQueries({ queryKey: ['bets'] })
+      qc.invalidateQueries({ queryKey: ['leaderboard'] })
+    }
+  })
+}
+
+export function useDeleteChampionship() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: ({ championshipId }: { championshipId: string }) =>
+      api.delete(`/championships/${championshipId}`).then(r => r.data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['championships'] })
+      qc.invalidateQueries({ queryKey: ['rounds'] })
+      qc.invalidateQueries({ queryKey: ['matches'] })
+      qc.invalidateQueries({ queryKey: ['bets'] })
+      qc.invalidateQueries({ queryKey: ['leaderboard'] })
     }
   })
 }

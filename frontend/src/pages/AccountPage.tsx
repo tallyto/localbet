@@ -3,20 +3,30 @@ import { useNavigate } from 'react-router-dom'
 import { Layout } from '../components/Layout'
 import { useAuth } from '../context/AuthContext'
 import { api } from '../api/client'
+import { useDeleteGroup, useMyGroups } from '../hooks/useGroups'
+import { Group } from '../types'
+import { ConfirmDialog } from '../components/ConfirmDialog'
 
 export function AccountPage() {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
   const [confirm, setConfirm] = useState('')
   const [error, setError] = useState('')
+  const [groupError, setGroupError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [deletingGroupId, setDeletingGroupId] = useState<string | null>(null)
+  const [groupToDelete, setGroupToDelete] = useState<Group | null>(null)
   const [showDanger, setShowDanger] = useState(false)
+  const { data: groups = [] } = useMyGroups()
+  const deleteGroup = useDeleteGroup()
 
   const confirmWord = user?.name ?? ''
   const canDelete = confirm.trim().toLowerCase() === confirmWord.trim().toLowerCase()
+  const ownedGroups = groups.filter(group => group.ownerId === user?.userId)
+  const hasOwnedGroups = ownedGroups.length > 0
 
   async function handleDelete() {
-    if (!canDelete) return
+    if (!canDelete || hasOwnedGroups) return
     setLoading(true)
     setError('')
     try {
@@ -27,6 +37,20 @@ export function AccountPage() {
       setError(err.response?.data?.error ?? 'Erro ao excluir conta. Tente novamente.')
     } finally {
       setLoading(false)
+    }
+  }
+
+  async function handleDeleteGroup() {
+    if (!groupToDelete) return
+    setDeletingGroupId(groupToDelete.id)
+    setGroupError('')
+    try {
+      await deleteGroup.mutateAsync(groupToDelete.id)
+      setGroupToDelete(null)
+    } catch (err: any) {
+      setGroupError(err.response?.data?.error ?? 'Erro ao excluir grupo. Tente novamente.')
+    } finally {
+      setDeletingGroupId(null)
     }
   }
 
@@ -77,6 +101,32 @@ export function AccountPage() {
                 <br />
                 <span className="font-semibold text-red-500">Grupos dos quais você é dono precisam ser excluídos antes.</span>
               </p>
+
+              {hasOwnedGroups && (
+                <div className="border border-red-100 rounded-lg divide-y divide-red-100 overflow-hidden">
+                  <div className="px-3 py-2 bg-red-50">
+                    <p className="text-xs font-semibold text-red-600">Grupos que bloqueiam a exclusão</p>
+                  </div>
+                  {ownedGroups.map(group => (
+                    <div key={group.id} className="px-3 py-2 flex items-center justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium text-gray-800 truncate">{group.name}</p>
+                        <p className="text-xs text-gray-400 font-mono">{group.inviteCode}</p>
+                      </div>
+                      <button
+                        onClick={() => setGroupToDelete(group)}
+                        disabled={deletingGroupId === group.id}
+                        className="shrink-0 text-xs text-red-600 border border-red-200 px-3 py-1.5 rounded-lg hover:bg-red-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                      >
+                        {deletingGroupId === group.id ? 'Excluindo...' : 'Excluir grupo'}
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {groupError && <p className="text-xs text-red-500">{groupError}</p>}
+
               <div>
                 <label className="text-xs text-gray-500 mb-1 block">
                   Digite seu nome <span className="font-semibold text-gray-700">"{confirmWord}"</span> para confirmar
@@ -92,7 +142,7 @@ export function AccountPage() {
               <div className="flex gap-2">
                 <button
                   onClick={handleDelete}
-                  disabled={!canDelete || loading}
+                  disabled={!canDelete || loading || hasOwnedGroups}
                   className="px-4 py-2 bg-red-600 text-white text-sm rounded-lg hover:bg-red-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                 >
                   {loading ? 'Excluindo...' : 'Confirmar exclusão'}
@@ -107,6 +157,15 @@ export function AccountPage() {
             </div>
           )}
         </div>
+        <ConfirmDialog
+          open={!!groupToDelete}
+          title="Excluir grupo"
+          description={`Excluir o grupo "${groupToDelete?.name ?? ''}"? Esta ação também remove apostas, campeonatos e partidas vinculadas a ele.`}
+          confirmLabel="Excluir"
+          loading={deleteGroup.isPending}
+          onConfirm={handleDeleteGroup}
+          onCancel={() => setGroupToDelete(null)}
+        />
       </div>
     </Layout>
   )

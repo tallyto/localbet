@@ -60,6 +60,10 @@ public class BetCalculationService {
 
             distributeWinnings(pending, totalPool, scoringMode, match.homeScore, match.awayScore);
         }
+
+        if (deferToChampionship && "CLOSED".equals(champ.status)) {
+            calculateChampionshipWinnings(champ);
+        }
     }
 
     /**

@@ -1,6 +1,7 @@
 package com.localbet.sport;
 
 import com.localbet.calculation.BetCalculationService;
+import com.localbet.bet.BetResult;
 import com.localbet.group.Group;
 import com.localbet.group.GroupMember;
 import io.quarkus.security.Authenticated;
@@ -40,6 +41,36 @@ public class ChampionshipResource {
     }
 
     @DELETE
+    @Path("/{id}")
+    @Transactional
+    public Response delete(@PathParam("id") UUID championshipId) {
+        Championship championship = Championship.findById(championshipId);
+        if (championship == null) {
+            return Response.status(404).entity("{\"error\":\"Campeonato não encontrado\"}").build();
+        }
+
+        UUID userId = UUID.fromString(jwt.getSubject());
+        boolean isOwner = GroupMember.count(
+            "group.id = ?1 AND user.id = ?2 AND role = 'OWNER'",
+            championship.group.id, userId) > 0;
+        if (!isOwner) {
+            return Response.status(403).entity("{\"error\":\"Apenas o dono do grupo pode remover campeonatos\"}").build();
+        }
+
+        List<UUID> matchIds = Match.getEntityManager()
+            .createQuery("SELECT m.id FROM Match m WHERE m.championship.id = :championshipId", UUID.class)
+            .setParameter("championshipId", championship.id)
+            .getResultList();
+        deleteMatchesByIds(matchIds);
+        Round.delete("championship.id", championship.id);
+        Championship.delete("id", championshipId);
+        Championship.getEntityManager().flush();
+        Championship.getEntityManager().clear();
+
+        return Response.noContent().build();
+    }
+
+    @DELETE
     @Path("/{id}/rounds/{roundId}")
     @Transactional
     public Response deleteRound(@PathParam("id") UUID championshipId, @PathParam("roundId") UUID roundId) {
@@ -56,15 +87,43 @@ public class ChampionshipResource {
             return Response.status(403).entity("{\"error\":\"Apenas o dono do grupo pode remover rodadas\"}").build();
         }
 
-        long matchCount = Match.count("round.id = ?1", round.id);
-        if (matchCount > 0) {
-            return Response.status(400)
-                .entity("{\"error\":\"Não é possível remover uma rodada com jogos. Remova os jogos primeiro.\"}")
-                .build();
+        Championship championship = round.championship;
+        boolean shouldRecalculate = "CHAMPIONSHIP".equals(championship.betScope) && "CLOSED".equals(championship.status);
+        List<UUID> matchIds = Match.getEntityManager()
+            .createQuery("SELECT m.id FROM Match m WHERE m.round.id = :roundId", UUID.class)
+            .setParameter("roundId", round.id)
+            .getResultList();
+        deleteMatchesByIds(matchIds);
+
+        Round.delete("id", roundId);
+        Round.getEntityManager().flush();
+        Round.getEntityManager().clear();
+
+        if (shouldRecalculate) {
+            Championship refreshedChampionship = Championship.findById(championshipId);
+            if (refreshedChampionship != null) {
+                calculationService.calculateChampionshipWinnings(refreshedChampionship);
+            }
         }
 
-        round.delete();
         return Response.noContent().build();
+    }
+
+    private void deleteMatchesByIds(List<UUID> matchIds) {
+        if (matchIds.isEmpty()) {
+            return;
+        }
+
+        List<UUID> betIds = BetResult.getEntityManager()
+            .createQuery("SELECT b.id FROM Bet b WHERE b.match.id IN :matchIds", UUID.class)
+            .setParameter("matchIds", matchIds)
+            .getResultList();
+        if (!betIds.isEmpty()) {
+            BetResult.delete("bet.id in ?1", betIds);
+            com.localbet.bet.Bet.delete("id in ?1", betIds);
+        }
+        GroupMatch.delete("match.id in ?1", matchIds);
+        Match.delete("id in ?1", matchIds);
     }
 
     @POST
