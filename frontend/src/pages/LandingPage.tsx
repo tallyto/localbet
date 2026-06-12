@@ -159,23 +159,29 @@ export function LandingPage() {
 
       {/* Origin */}
       <section className="py-20 px-5 bg-gray-50 border-y border-gray-100">
-        <div className="max-w-5xl mx-auto grid lg:grid-cols-[0.9fr_1.1fr] gap-10 items-start">
+        <div className="max-w-5xl mx-auto grid lg:grid-cols-[0.95fr_1.05fr] gap-10 items-start">
           <div>
             <p className="text-xs font-semibold uppercase tracking-wide text-brand-600 mb-3">Por que LocalBet?</p>
             <h2 className="text-3xl font-bold text-gray-900 leading-tight">
-              Um localhost colocado em mar aberto.
+              Um produto pequeno o bastante para nascer local. Aberto o bastante para aprender em público.
             </h2>
           </div>
-          <div className="space-y-4 text-gray-500 leading-relaxed">
-            <p>
-              O nome nasceu da própria origem do projeto: uma ideia que começou local, em ambiente de desenvolvimento, e foi colocada em produção para sentir o mundo real.
+          <div>
+            <p className="text-gray-500 leading-relaxed mb-6">
+              LocalBet nasceu como um experimento direto: tirar uma ideia do localhost, colocar em produção sem cerimônia e descobrir como grupos reais usam um bolão quando entrar, convidar e jogar é simples.
             </p>
-            <p>
-              O objetivo é simples: facilitar o cadastro, deixar pessoas entrarem sem atrito e observar como grupos reais se comportam criando bolões, convidando amigos, apostando, competindo e voltando para acompanhar os resultados.
-            </p>
-            <p className="text-sm text-gray-400">
-              LocalBet é esse experimento vivo: pequeno o suficiente para nascer de um localhost, aberto o suficiente para aprender com usuários de verdade.
-            </p>
+            <div className="grid sm:grid-cols-3 gap-3">
+              {[
+                ['Local primeiro', 'Construído perto do problema, rápido de ajustar e sem depender de grandes estruturas.'],
+                ['Aberto ao real', 'Cadastro fácil para observar comportamento de verdade, não opinião em reunião.'],
+                ['Jogo social', 'Ranking, feed e conquistas para entender o que faz um grupo voltar.'],
+              ].map(([title, description]) => (
+                <div key={title} className="rounded-lg border border-gray-200 bg-white p-4">
+                  <p className="text-sm font-semibold text-gray-900 mb-1">{title}</p>
+                  <p className="text-xs text-gray-500 leading-relaxed">{description}</p>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
