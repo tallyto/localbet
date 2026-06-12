@@ -85,6 +85,8 @@ export function GroupPage() {
 
   const hasStandalone = (matches ?? []).some(m => !m.championship)
   const activityItems = buildActivityItems(matches ?? [], leaderboard ?? [])
+  const myLeaderboardEntry = (leaderboard ?? []).find(entry => entry.userId === user?.userId)
+  const myLeaderboardPosition = (leaderboard ?? []).findIndex(entry => entry.userId === user?.userId) + 1
 
   if (!groupId) return null
 
@@ -227,6 +229,10 @@ export function GroupPage() {
               </button>
             )}
           </div>
+
+          {myLeaderboardEntry && (
+            <PlayerProfileCard entry={myLeaderboardEntry} position={myLeaderboardPosition} />
+          )}
 
           {!leaderboard?.length ? (
             <div className="card p-10 text-center mt-2">
@@ -458,6 +464,72 @@ function GroupSummary({ matches, championships, leaderboard }: {
             <p className="text-xs text-brand-700">Nível {leader.level}</p>
             <p className="text-xs text-brand-700">{leader.exactScores} exato{leader.exactScores !== 1 ? 's' : ''}</p>
           </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+function PlayerProfileCard({ entry, position }: {
+  entry: import('../types').LeaderboardEntry
+  position: number
+}) {
+  const currentLevelXp = (entry.level - 1) * 100
+  const levelProgress = entry.nextLevelXp > currentLevelXp
+    ? Math.min(100, Math.max(0, ((entry.xp - currentLevelXp) / (entry.nextLevelXp - currentLevelXp)) * 100))
+    : 100
+  const accuracy = entry.totalBets > 0 ? Math.round((entry.exactScores / entry.totalBets) * 100) : 0
+
+  return (
+    <div className="mb-4 rounded-lg border border-brand-100 bg-brand-50 p-4">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-wide text-brand-700">Meu desempenho</p>
+          <h3 className="font-bold text-gray-900 mt-0.5">{entry.userName}</h3>
+        </div>
+        <div className="flex gap-2">
+          <span className="rounded-full bg-white/80 border border-brand-100 px-3 py-1 text-xs font-semibold text-brand-700">
+            #{position}
+          </span>
+          <span className="rounded-full bg-white/80 border border-brand-100 px-3 py-1 text-xs font-semibold text-brand-700">
+            Nível {entry.level}
+          </span>
+        </div>
+      </div>
+
+      <div className="mt-4 grid gap-2 sm:grid-cols-4">
+        <div>
+          <p className="text-[11px] uppercase tracking-wide text-brand-700 font-semibold">Pontos</p>
+          <p className="text-lg font-bold text-gray-900">{entry.totalPoints}</p>
+        </div>
+        <div>
+          <p className="text-[11px] uppercase tracking-wide text-brand-700 font-semibold">XP</p>
+          <p className="text-lg font-bold text-gray-900">{entry.xp}</p>
+        </div>
+        <div>
+          <p className="text-[11px] uppercase tracking-wide text-brand-700 font-semibold">Exatos</p>
+          <p className="text-lg font-bold text-gray-900">{entry.exactScores}</p>
+        </div>
+        <div>
+          <p className="text-[11px] uppercase tracking-wide text-brand-700 font-semibold">Aproveitamento</p>
+          <p className="text-lg font-bold text-gray-900">{accuracy}%</p>
+        </div>
+      </div>
+
+      <div className="mt-3 flex items-center gap-2">
+        <div className="h-2 flex-1 rounded-full bg-white/80 overflow-hidden">
+          <div className="h-full rounded-full bg-brand-500" style={{ width: `${levelProgress}%` }} />
+        </div>
+        <span className="text-xs text-brand-700 w-20 text-right">{entry.nextLevelXp - entry.xp} XP</span>
+      </div>
+
+      {(entry.badges ?? []).length > 0 && (
+        <div className="mt-3 flex flex-wrap gap-1.5">
+          {(entry.badges ?? []).map(badge => (
+            <span key={badge} className="text-[11px] font-medium px-2 py-1 rounded-full bg-white/80 border border-brand-100 text-gray-700">
+              {badge}
+            </span>
+          ))}
         </div>
       )}
     </div>
