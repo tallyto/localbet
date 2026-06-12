@@ -59,23 +59,19 @@ export function LandingPage() {
       </nav>
 
       {/* Hero */}
-      <section className="relative overflow-hidden bg-gray-950">
-        <div className="absolute inset-y-8 right-[-7rem] hidden lg:block w-[36rem] opacity-80">
-          <AppMockup />
-        </div>
-        <div className="max-w-6xl mx-auto px-5 py-20 lg:py-24 relative">
-          <div className="max-w-xl">
+      <section className="max-w-6xl mx-auto px-5 pt-16 pb-12 grid lg:grid-cols-2 gap-10 items-center">
+        <div>
           <div className="inline-flex items-center gap-1.5 bg-brand-50 text-brand-700 text-xs font-semibold px-3 py-1.5 rounded-full mb-6 border border-brand-100">
             <span className="w-1.5 h-1.5 rounded-full bg-brand-500 animate-pulse" />
             Ranking, XP, badges e notificações
           </div>
 
-          <h1 className="text-4xl sm:text-5xl font-extrabold text-white leading-[1.1] mb-5">
-            LocalBet<br />
-            <span className="text-brand-400">o bolão virou jogo.</span>
+          <h1 className="text-4xl sm:text-5xl font-extrabold text-gray-900 leading-[1.1] mb-5">
+            Bolão com amigos,<br />
+            <span className="text-brand-600">agora com jogo.</span>
           </h1>
 
-          <p className="text-lg text-gray-300 leading-relaxed mb-8 max-w-lg">
+          <p className="text-lg text-gray-500 leading-relaxed mb-8 max-w-lg">
             Crie grupos, convide por link, acompanhe feed, notificações, ranking por período, XP, níveis e conquistas. Tudo sem banca no meio.
           </p>
 
@@ -84,12 +80,12 @@ export function LandingPage() {
               Criar meu bolão agora
               <ChevronRight className="w-4 h-4" />
             </Link>
-            <Link to="/login" className="inline-flex items-center justify-center gap-2 px-6 py-3 border border-white/30 text-white rounded-lg text-base font-medium hover:bg-white/10 transition-colors">
+            <Link to="/login" className="btn-outline px-6 py-3 text-base">
               Já tenho conta
             </Link>
           </div>
 
-          <div className="flex flex-wrap items-center gap-4 text-sm text-gray-300">
+          <div className="flex flex-wrap items-center gap-4 text-sm text-gray-400">
             {['Gratuito', 'Sem cartão', 'Convite por link', 'Funciona no celular'].map(t => (
               <span key={t} className="flex items-center gap-1">
                 <Check className="w-3.5 h-3.5 text-brand-500 flex-shrink-0" />
@@ -97,7 +93,10 @@ export function LandingPage() {
               </span>
             ))}
           </div>
-          </div>
+        </div>
+
+        <div className="hidden lg:block">
+          <AppMockup />
         </div>
       </section>
 
