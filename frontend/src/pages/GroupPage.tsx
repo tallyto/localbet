@@ -9,7 +9,7 @@ import { useAuth } from '../context/AuthContext'
 import { Championship, Match } from '../types'
 import { ConfirmDialog } from '../components/ConfirmDialog'
 import { DateTimePicker } from '../components/DateTimePicker'
-import { Plus, Trophy, Swords, Trash2, ChevronDown, ChevronUp, Loader2, Target, Info, List, Columns, Award, Star } from 'lucide-react'
+import { Plus, Trophy, Swords, Trash2, ChevronDown, ChevronUp, Loader2, Target, Info, List, Columns, Award, Star, Activity } from 'lucide-react'
 
 function Tooltip({ children, content }: { children: React.ReactNode; content: React.ReactNode }) {
   return (
@@ -65,7 +65,7 @@ const formatMatchDate = (dateStr: string) => {
 export function GroupPage() {
   const { groupId } = useParams<{ groupId: string }>()
   const { user } = useAuth()
-  const [tab, setTab] = useState<'matches' | 'leaderboard'>('matches')
+  const [tab, setTab] = useState<'matches' | 'leaderboard' | 'activity'>('matches')
   const [showNewMatch, setShowNewMatch] = useState(false)
   const [rankingScope, setRankingScope] = useState<{ type: 'overall' | 'championship' | 'standalone'; championshipId?: string }>({ type: 'overall' })
 
@@ -84,6 +84,7 @@ export function GroupPage() {
   const { data: leaderboard } = useLeaderboard(groupId ?? '', leaderboardScope)
 
   const hasStandalone = (matches ?? []).some(m => !m.championship)
+  const activityItems = buildActivityItems(matches ?? [], leaderboard ?? [])
 
   if (!groupId) return null
 
@@ -111,6 +112,17 @@ export function GroupPage() {
         >
           <Trophy className="w-3.5 h-3.5" />
           Ranking
+        </button>
+        <button
+          onClick={() => setTab('activity')}
+          className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+            tab === 'activity'
+              ? 'bg-white text-gray-900 shadow-card'
+              : 'text-gray-500 hover:text-gray-700'
+          }`}
+        >
+          <Activity className="w-3.5 h-3.5" />
+          Feed
         </button>
       </div>
 
@@ -310,7 +322,98 @@ export function GroupPage() {
           )}
         </div>
       )}
+
+      {tab === 'activity' && (
+        <ActivityFeed items={activityItems} />
+      )}
     </Layout>
+  )
+}
+
+type ActivityItem = {
+  id: string
+  title: string
+  description: string
+  tone: 'success' | 'info' | 'warning'
+}
+
+function buildActivityItems(matches: Match[], leaderboard: import('../types').LeaderboardEntry[]): ActivityItem[] {
+  const items: ActivityItem[] = []
+  const leader = leaderboard[0]
+
+  if (leader) {
+    items.push({
+      id: `leader:${leader.userId}`,
+      title: `${leader.userName} lidera o ranking`,
+      description: `${leader.totalPoints} pontos, nível ${leader.level} e ${leader.exactScores} placar${leader.exactScores !== 1 ? 'es' : ''} exato${leader.exactScores !== 1 ? 's' : ''}.`,
+      tone: 'success',
+    })
+  }
+
+  leaderboard.slice(0, 5).forEach(entry => {
+    ;(entry.badges ?? []).slice(0, 2).forEach(badge => {
+      items.push({
+        id: `badge:${entry.userId}:${badge}`,
+        title: `${entry.userName} desbloqueou ${badge}`,
+        description: `${entry.xp} XP acumulados no grupo.`,
+        tone: 'info',
+      })
+    })
+  })
+
+  matches
+    .filter(match => match.status === 'FINISHED')
+    .slice(0, 8)
+    .forEach(match => {
+      items.push({
+        id: `match:${match.id}`,
+        title: `${match.homeTeam} ${match.homeScore} x ${match.awayScore} ${match.awayTeam}`,
+        description: match.championship ? `${match.championship.name}${match.round ? ` · ${match.round.name}` : ''}` : 'Partida avulsa finalizada',
+        tone: 'warning',
+      })
+    })
+
+  return items.slice(0, 20)
+}
+
+function ActivityFeed({ items }: { items: ActivityItem[] }) {
+  if (items.length === 0) {
+    return (
+      <div className="card p-10 text-center mt-2">
+        <div className="w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center mx-auto mb-3">
+          <Activity className="w-6 h-6 text-gray-400" />
+        </div>
+        <p className="font-medium text-gray-700 mb-1">Nenhuma atividade ainda</p>
+        <p className="text-sm text-gray-400">O feed aparece quando partidas forem finalizadas e o ranking começar a mudar.</p>
+      </div>
+    )
+  }
+
+  return (
+    <div>
+      <h2 className="font-semibold text-gray-900 mb-3">Feed do grupo</h2>
+      <div className="space-y-2">
+        {items.map(item => {
+          const toneClass = item.tone === 'success'
+            ? 'bg-brand-50 text-brand-700 border-brand-100'
+            : item.tone === 'warning'
+            ? 'bg-yellow-50 text-yellow-700 border-yellow-100'
+            : 'bg-blue-50 text-blue-700 border-blue-100'
+
+          return (
+            <div key={item.id} className="card p-4 flex gap-3">
+              <div className={`w-9 h-9 rounded-lg border flex items-center justify-center flex-shrink-0 ${toneClass}`}>
+                <Activity className="w-4 h-4" />
+              </div>
+              <div className="min-w-0">
+                <p className="font-semibold text-gray-900 text-sm">{item.title}</p>
+                <p className="text-xs text-gray-500 mt-0.5 leading-relaxed">{item.description}</p>
+              </div>
+            </div>
+          )
+        })}
+      </div>
+    </div>
   )
 }
 
