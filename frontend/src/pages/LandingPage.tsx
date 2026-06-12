@@ -163,18 +163,18 @@ export function LandingPage() {
           <div>
             <p className="text-xs font-semibold uppercase tracking-wide text-brand-600 mb-3">Por que LocalBet?</p>
             <h2 className="text-3xl font-bold text-gray-900 leading-tight">
-              Um produto pequeno o bastante para nascer local. Aberto o bastante para aprender em público.
+              Nasceu no localhost. Foi para a rua para aprender com gente jogando de verdade.
             </h2>
           </div>
           <div>
             <p className="text-gray-500 leading-relaxed mb-6">
-              LocalBet nasceu como um experimento direto: tirar uma ideia do localhost, colocar em produção sem cerimônia e descobrir como grupos reais usam um bolão quando entrar, convidar e jogar é simples.
+              LocalBet é um nome com memória de origem: saiu de um ambiente local, foi publicado em produção e passou a medir o que importa fora da teoria. A pergunta não era “será que a ideia é boa?”, era “o que as pessoas fazem quando conseguem criar um bolão em poucos segundos?”.
             </p>
             <div className="grid sm:grid-cols-3 gap-3">
               {[
-                ['Local primeiro', 'Construído perto do problema, rápido de ajustar e sem depender de grandes estruturas.'],
-                ['Aberto ao real', 'Cadastro fácil para observar comportamento de verdade, não opinião em reunião.'],
-                ['Jogo social', 'Ranking, feed e conquistas para entender o que faz um grupo voltar.'],
+                ['Baixa fricção', 'Entrar, criar grupo e convidar precisa ser rápido. Se demora, o grupo esfria.'],
+                ['Uso real', 'O produto aprende com partidas, convites, rankings e retornos, não só com suposições.'],
+                ['Diversão que volta', 'XP, feed, badges e notificações existem para transformar placar em hábito social.'],
               ].map(([title, description]) => (
                 <div key={title} className="rounded-lg border border-gray-200 bg-white p-4">
                   <p className="text-sm font-semibold text-gray-900 mb-1">{title}</p>
