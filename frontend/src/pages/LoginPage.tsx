@@ -67,7 +67,9 @@ export function LoginPage() {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">Email</label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+                  <Mail className="w-4 h-4 text-gray-400" />
+                </div>
                 <input
                   type="email"
                   value={email}
@@ -82,7 +84,9 @@ export function LoginPage() {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">Senha</label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+                  <Lock className="w-4 h-4 text-gray-400" />
+                </div>
                 <input
                   type={showPassword ? 'text' : 'password'}
                   value={password}
@@ -94,7 +98,7 @@ export function LoginPage() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(v => !v)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  className="absolute inset-y-0 right-3 flex items-center text-gray-400 hover:text-gray-600"
                   tabIndex={-1}
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
