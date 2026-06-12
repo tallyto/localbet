@@ -28,6 +28,9 @@ import java.util.random.RandomGenerator;
 @Consumes(MediaType.APPLICATION_JSON)
 public class GroupResource {
 
+    private static final String GROUP_MEMBER_QUERY = "group.id = ?1 AND user.id = ?2";
+    private static final String ERROR_NOT_GROUP_MEMBER = "{\"error\":\"Você não participa deste grupo\"}";
+
     @Inject
     JsonWebToken jwt;
 
@@ -74,8 +77,7 @@ public class GroupResource {
                         Response.status(404).entity("{\"error\":\"Grupo não encontrado\"}").build()));
 
         UUID userId = currentUserId();
-        boolean alreadyMember = GroupMember.count(
-                "group.id = ?1 AND user.id = ?2", group.id, userId) > 0;
+        boolean alreadyMember = GroupMember.count(GROUP_MEMBER_QUERY, group.id, userId) > 0;
 
         if (alreadyMember) {
             return Response.status(409).entity("{\"error\":\"Você já é membro deste grupo\"}").build();
@@ -96,18 +98,14 @@ public class GroupResource {
     public Response getGroup(@PathParam("id") UUID groupId) {
         Group g = Group.findById(groupId);
         if (g == null) return Response.status(404).build();
-        if (!isMember(groupId, currentUserId())) {
-            return Response.status(403).entity("{\"error\":\"Você não participa deste grupo\"}").build();
-        }
+        requireMember(groupId);
         return Response.ok(g).build();
     }
 
     @GET
     @Path("/{id}/members")
     public Response members(@PathParam("id") UUID groupId) {
-        if (!isMember(groupId, currentUserId())) {
-            return Response.status(403).entity("{\"error\":\"Você não participa deste grupo\"}").build();
-        }
+        requireMember(groupId);
         return Response.ok(GroupMember.list("group.id", groupId)).build();
     }
 
@@ -183,11 +181,7 @@ public class GroupResource {
             @PathParam("id") UUID groupId,
             @QueryParam("championshipId") UUID championshipId,
             @QueryParam("standalone") @DefaultValue("false") boolean standalone) {
-        if (!isMember(groupId, currentUserId())) {
-            throw new WebApplicationException(
-                Response.status(403).entity("{\"error\":\"Você não participa deste grupo\"}").build()
-            );
-        }
+        requireMember(groupId);
 
         String filter = "WHERE b.group.id = :groupId";
         if (championshipId != null) {
@@ -226,7 +220,15 @@ public class GroupResource {
     }
 
     private boolean isMember(UUID groupId, UUID userId) {
-        return GroupMember.count("group.id = ?1 AND user.id = ?2", groupId, userId) > 0;
+        return GroupMember.count(GROUP_MEMBER_QUERY, groupId, userId) > 0;
+    }
+
+    private void requireMember(UUID groupId) {
+        if (!isMember(groupId, currentUserId())) {
+            throw new WebApplicationException(
+                Response.status(403).entity(ERROR_NOT_GROUP_MEMBER).build()
+            );
+        }
     }
 
     private String generateCode() {
