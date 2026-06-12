@@ -9,6 +9,7 @@
 - [x] Player profile summary with XP, badges and accuracy.
 - [x] Ranking filters by week and month.
 - [x] Shareable invite links.
+- [x] Persistent activity events and notifications in the backend.
 
 ## Next
 
@@ -22,7 +23,6 @@
 - [ ] Transfer group ownership.
 - [ ] Audit log for score registration and corrections.
 - [ ] CSV import for match lists.
-- [ ] Persistent notifications in the backend.
 - [ ] Push/email notification channels.
 
 ## Commit Plan
