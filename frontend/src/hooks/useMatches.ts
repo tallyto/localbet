@@ -42,6 +42,8 @@ export function useSetScore() {
       qc.invalidateQueries({ queryKey: ['matches'] })
       qc.invalidateQueries({ queryKey: ['bets'] })
       qc.invalidateQueries({ queryKey: ['leaderboard'] })
+      qc.invalidateQueries({ queryKey: ['activity'] })
+      qc.invalidateQueries({ queryKey: ['activity-notifications'] })
     }
   })
 }
@@ -55,6 +57,8 @@ export function useUpdateScore() {
       qc.invalidateQueries({ queryKey: ['matches'] })
       qc.invalidateQueries({ queryKey: ['bets'] })
       qc.invalidateQueries({ queryKey: ['leaderboard'] })
+      qc.invalidateQueries({ queryKey: ['activity'] })
+      qc.invalidateQueries({ queryKey: ['activity-notifications'] })
     }
   })
 }
@@ -64,6 +68,10 @@ export function useDeleteMatch() {
   return useMutation({
     mutationFn: ({ matchId, groupId }: { matchId: string; groupId: string }) =>
       api.delete(`/matches/${matchId}`).then(r => r.data),
-    onSuccess: (_data, vars) => qc.invalidateQueries({ queryKey: ['matches', vars.groupId] })
+    onSuccess: (_data, vars) => {
+      qc.invalidateQueries({ queryKey: ['matches', vars.groupId] })
+      qc.invalidateQueries({ queryKey: ['activity', vars.groupId] })
+      qc.invalidateQueries({ queryKey: ['activity-notifications'] })
+    }
   })
 }

@@ -85,3 +85,15 @@ export interface LeaderboardEntry {
   nextLevelXp: number
   badges: string[]
 }
+
+export interface ActivityEvent {
+  id: string
+  groupId: string
+  groupName: string
+  targetUserId?: string
+  type: string
+  title: string
+  description: string
+  tone: 'success' | 'info' | 'warning'
+  createdAt: string
+}

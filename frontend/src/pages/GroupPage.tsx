@@ -5,8 +5,9 @@ import { useGroupMatches, useCreateMatch, useSetScore, useUpdateScore, useDelete
 import { useGroupChampionships, useCreateChampionship, useCloseChampionship, useChampionshipRounds, useCreateRound, useDeleteRound, useDeleteChampionship } from '../hooks/useChampionships'
 import { useGroupMatchBets, usePlaceBet } from '../hooks/useBets'
 import { useLeaderboard, useMyRole, useGroup } from '../hooks/useGroups'
+import { useGroupActivity } from '../hooks/useActivity'
 import { useAuth } from '../context/AuthContext'
-import { Championship, Match } from '../types'
+import { ActivityEvent, Championship, Match } from '../types'
 import { ConfirmDialog } from '../components/ConfirmDialog'
 import { DateTimePicker } from '../components/DateTimePicker'
 import { Plus, Trophy, Swords, Trash2, ChevronDown, ChevronUp, Loader2, Target, Info, List, Columns, Award, Star, Activity } from 'lucide-react'
@@ -73,6 +74,7 @@ export function GroupPage() {
   const { data: group } = useGroup(groupId ?? '')
   const { data: matches, isLoading } = useGroupMatches(groupId ?? '')
   const { data: championships } = useGroupChampionships(groupId ?? '')
+  const { data: activityEvents } = useGroupActivity(groupId ?? '')
   const myRole = useMyRole(groupId ?? '', user?.userId)
   const isOwner = myRole === 'OWNER'
   const [showNewChampionship, setShowNewChampionship] = useState(false)
@@ -85,7 +87,6 @@ export function GroupPage() {
   const { data: leaderboard } = useLeaderboard(groupId ?? '', leaderboardScope)
 
   const hasStandalone = (matches ?? []).some(m => !m.championship)
-  const activityItems = buildActivityItems(matches ?? [], leaderboard ?? [])
   const myLeaderboardEntry = (leaderboard ?? []).find(entry => entry.userId === user?.userId)
   const myLeaderboardPosition = (leaderboard ?? []).findIndex(entry => entry.userId === user?.userId) + 1
 
@@ -357,59 +358,13 @@ export function GroupPage() {
       )}
 
       {tab === 'activity' && (
-        <ActivityFeed items={activityItems} />
+        <ActivityFeed items={activityEvents ?? []} />
       )}
     </Layout>
   )
 }
 
-type ActivityItem = {
-  id: string
-  title: string
-  description: string
-  tone: 'success' | 'info' | 'warning'
-}
-
-function buildActivityItems(matches: Match[], leaderboard: import('../types').LeaderboardEntry[]): ActivityItem[] {
-  const items: ActivityItem[] = []
-  const leader = leaderboard[0]
-
-  if (leader) {
-    items.push({
-      id: `leader:${leader.userId}`,
-      title: `${leader.userName} lidera o ranking`,
-      description: `${leader.totalPoints} pontos, nível ${leader.level} e ${leader.exactScores} placar${leader.exactScores !== 1 ? 'es' : ''} exato${leader.exactScores !== 1 ? 's' : ''}.`,
-      tone: 'success',
-    })
-  }
-
-  leaderboard.slice(0, 5).forEach(entry => {
-    ;(entry.badges ?? []).slice(0, 2).forEach(badge => {
-      items.push({
-        id: `badge:${entry.userId}:${badge}`,
-        title: `${entry.userName} desbloqueou ${badge}`,
-        description: `${entry.xp} XP acumulados no grupo.`,
-        tone: 'info',
-      })
-    })
-  })
-
-  matches
-    .filter(match => match.status === 'FINISHED')
-    .slice(0, 8)
-    .forEach(match => {
-      items.push({
-        id: `match:${match.id}`,
-        title: `${match.homeTeam} ${match.homeScore} x ${match.awayScore} ${match.awayTeam}`,
-        description: match.championship ? `${match.championship.name}${match.round ? ` · ${match.round.name}` : ''}` : 'Partida avulsa finalizada',
-        tone: 'warning',
-      })
-    })
-
-  return items.slice(0, 20)
-}
-
-function ActivityFeed({ items }: { items: ActivityItem[] }) {
+function ActivityFeed({ items }: { items: ActivityEvent[] }) {
   if (items.length === 0) {
     return (
       <div className="card p-10 text-center mt-2">

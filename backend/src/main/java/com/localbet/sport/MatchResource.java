@@ -1,6 +1,7 @@
 package com.localbet.sport;
 
 import com.localbet.calculation.BetCalculationService;
+import com.localbet.activity.ActivityService;
 import com.localbet.group.GroupMember;
 import io.quarkus.security.Authenticated;
 import jakarta.inject.Inject;
@@ -22,6 +23,9 @@ public class MatchResource {
 
     @Inject
     BetCalculationService calculationService;
+
+    @Inject
+    ActivityService activityService;
 
     @Inject
     JsonWebToken jwt;
@@ -63,6 +67,7 @@ public class MatchResource {
         match.persist();
 
         calculationService.calculateForMatch(match);
+        activityService.recordMatchFinished(match, false);
 
         return Response.ok(match).build();
     }
@@ -100,6 +105,7 @@ public class MatchResource {
         // Recalcular: deletar resultados anteriores e recalcular
         com.localbet.bet.BetResult.delete("bet.match.id", matchId);
         calculationService.calculateForMatch(match);
+        activityService.recordMatchFinished(match, true);
 
         return Response.ok(match).build();
     }
@@ -124,6 +130,7 @@ public class MatchResource {
         }
 
         // Deletar dependências em cascata
+        activityService.deleteForMatch(matchId);
         com.localbet.bet.BetResult.delete("bet.match.id", matchId);
         com.localbet.bet.Bet.delete("match.id", matchId);
         GroupMatch.delete("match.id", matchId);
