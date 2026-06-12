@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Layout } from '../components/Layout'
 import { useMyGroups, useCreateGroup, useJoinGroup } from '../hooks/useGroups'
+import { Plus, Hash, Users, Copy, Check, ChevronRight, Loader2 } from 'lucide-react'
 
 export function DashboardPage() {
   const { data: groups, isLoading } = useMyGroups()
@@ -40,80 +41,91 @@ export function DashboardPage() {
     }
   }
 
+  function openCreate() { setShowCreate(true); setShowJoin(false); setError('') }
+  function openJoin() { setShowJoin(true); setShowCreate(false); setError('') }
+
   return (
     <Layout>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-800">Meus Grupos</h1>
+        <div>
+          <h1 className="text-xl font-bold text-gray-900">Meus Grupos</h1>
+          {!isLoading && (
+            <p className="text-sm text-gray-500 mt-0.5">
+              {groups?.length === 0 ? 'Nenhum grupo ainda' : `${groups?.length} grupo${groups?.length !== 1 ? 's' : ''}`}
+            </p>
+          )}
+        </div>
         <div className="flex gap-2">
-          <button
-            onClick={() => { setShowJoin(true); setShowCreate(false); setError('') }}
-            className="px-4 py-2 border border-green-600 text-green-600 rounded-lg hover:bg-green-50 text-sm font-medium transition-colors"
-          >
-            Entrar com código
+          <button onClick={openJoin} className="btn-outline gap-1.5">
+            <Hash className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Entrar com código</span>
+            <span className="sm:hidden">Entrar</span>
           </button>
-          <button
-            onClick={() => { setShowCreate(true); setShowJoin(false); setError('') }}
-            className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm font-medium transition-colors"
-          >
-            Criar grupo
+          <button onClick={openCreate} className="btn-primary gap-1.5">
+            <Plus className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Criar grupo</span>
+            <span className="sm:hidden">Criar</span>
           </button>
         </div>
       </div>
 
       {(showCreate || showJoin) && (
-        <div className="mb-6 p-4 bg-white rounded-xl border border-gray-200">
+        <div className="mb-6 card p-4">
+          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">
+            {showCreate ? 'Novo grupo' : 'Entrar em um grupo'}
+          </p>
           {showCreate && (
-            <form onSubmit={handleCreate} className="flex gap-3">
+            <form onSubmit={handleCreate} className="flex gap-2">
               <input
                 value={groupName}
                 onChange={e => setGroupName(e.target.value)}
-                placeholder="Nome do grupo"
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
+                placeholder="Ex: Bolão da empresa"
+                className="input-base flex-1"
                 required
+                autoFocus
               />
-              <button type="submit" disabled={createGroup.isPending}
-                className="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 disabled:opacity-60">
-                {createGroup.isPending ? 'Criando...' : 'Criar'}
+              <button type="submit" disabled={createGroup.isPending} className="btn-primary flex-shrink-0">
+                {createGroup.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Criar'}
               </button>
-              <button type="button" onClick={() => setShowCreate(false)}
-                className="px-4 py-2 text-gray-500 hover:text-gray-700 text-sm">
+              <button type="button" onClick={() => setShowCreate(false)} className="btn-ghost flex-shrink-0">
                 Cancelar
               </button>
             </form>
           )}
           {showJoin && (
-            <form onSubmit={handleJoin} className="flex gap-3">
+            <form onSubmit={handleJoin} className="flex gap-2">
               <input
                 value={inviteCode}
                 onChange={e => setInviteCode(e.target.value.toUpperCase())}
-                placeholder="Código do grupo (ex: ABC12345)"
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-sm font-mono"
+                placeholder="Código (ex: ABC12345)"
+                className="input-base flex-1 font-mono tracking-widest"
                 maxLength={8}
                 required
+                autoFocus
               />
-              <button type="submit" disabled={joinGroup.isPending}
-                className="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 disabled:opacity-60">
-                {joinGroup.isPending ? 'Entrando...' : 'Entrar'}
+              <button type="submit" disabled={joinGroup.isPending} className="btn-primary flex-shrink-0">
+                {joinGroup.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Entrar'}
               </button>
-              <button type="button" onClick={() => setShowJoin(false)}
-                className="px-4 py-2 text-gray-500 hover:text-gray-700 text-sm">
+              <button type="button" onClick={() => setShowJoin(false)} className="btn-ghost flex-shrink-0">
                 Cancelar
               </button>
             </form>
           )}
-          {error && <p className="mt-2 text-red-600 text-sm">{error}</p>}
+          {error && (
+            <p className="mt-2.5 text-sm text-red-600 flex items-center gap-1.5">
+              <span className="w-1 h-1 rounded-full bg-red-500 flex-shrink-0" />
+              {error}
+            </p>
+          )}
         </div>
       )}
 
       {isLoading ? (
-        <div className="text-center py-12 text-gray-400">Carregando...</div>
+        <GroupsSkeleton />
       ) : groups?.length === 0 ? (
-        <div className="text-center py-12">
-          <p className="text-gray-500">Você ainda não participa de nenhum grupo.</p>
-          <p className="text-gray-400 text-sm mt-1">Crie um novo ou entre com um código de convite.</p>
-        </div>
+        <EmptyGroups onCreate={openCreate} onJoin={openJoin} />
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-3 sm:grid-cols-2">
           {groups?.map(group => (
             <GroupCard key={group.id} group={group} onClick={() => navigate(`/groups/${group.id}`)} />
           ))}
@@ -123,7 +135,13 @@ export function DashboardPage() {
   )
 }
 
-function GroupCard({ group, onClick }: { group: { id: string; name: string; inviteCode: string; ownerId: string; createdAt: string }; onClick: () => void }) {
+function GroupCard({
+  group,
+  onClick,
+}: {
+  group: { id: string; name: string; inviteCode: string; ownerId: string; createdAt: string }
+  onClick: () => void
+}) {
   const [copied, setCopied] = useState(false)
 
   function copyCode(e: React.MouseEvent) {
@@ -136,16 +154,69 @@ function GroupCard({ group, onClick }: { group: { id: string; name: string; invi
   return (
     <div
       onClick={onClick}
-      className="cursor-pointer p-5 bg-white rounded-xl border border-gray-200 hover:border-green-400 hover:shadow-sm transition-all"
+      className="card p-5 cursor-pointer hover:shadow-card-hover hover:border-brand-200 transition-all group"
     >
-      <h3 className="font-semibold text-gray-800">{group.name}</h3>
-      <div className="flex items-center justify-between mt-2">
-        <span className="text-xs text-gray-400 font-mono">{group.inviteCode}</span>
-        <button
-          onClick={copyCode}
-          className="text-xs px-2 py-0.5 rounded border border-gray-200 text-gray-500 hover:border-green-400 hover:text-green-600 transition-colors"
-        >
-          {copied ? 'Copiado!' : 'Copiar código'}
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="w-10 h-10 rounded-xl bg-brand-100 flex items-center justify-center flex-shrink-0">
+            <Users className="w-5 h-5 text-brand-600" />
+          </div>
+          <div className="min-w-0">
+            <h3 className="font-semibold text-gray-900 truncate">{group.name}</h3>
+            <div className="flex items-center gap-1.5 mt-0.5">
+              <span className="text-xs text-gray-400 font-mono tracking-wider">{group.inviteCode}</span>
+              <button
+                onClick={copyCode}
+                className="text-gray-300 hover:text-brand-600 transition-colors"
+                title="Copiar código"
+              >
+                {copied ? <Check className="w-3 h-3 text-brand-500" /> : <Copy className="w-3 h-3" />}
+              </button>
+            </div>
+          </div>
+        </div>
+        <ChevronRight className="w-4 h-4 text-gray-300 group-hover:text-brand-400 flex-shrink-0 mt-1 transition-colors" />
+      </div>
+    </div>
+  )
+}
+
+function GroupsSkeleton() {
+  return (
+    <div className="grid gap-3 sm:grid-cols-2">
+      {[1, 2, 3].map(i => (
+        <div key={i} className="card p-5">
+          <div className="flex items-center gap-3">
+            <div className="skeleton w-10 h-10 rounded-xl" />
+            <div className="flex-1 space-y-2">
+              <div className="skeleton h-4 w-3/4 rounded" />
+              <div className="skeleton h-3 w-1/3 rounded" />
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+function EmptyGroups({ onCreate, onJoin }: { onCreate: () => void; onJoin: () => void }) {
+  return (
+    <div className="card p-10 text-center">
+      <div className="w-14 h-14 rounded-2xl bg-brand-50 flex items-center justify-center mx-auto mb-4">
+        <Users className="w-7 h-7 text-brand-400" />
+      </div>
+      <h3 className="font-semibold text-gray-800 mb-1">Nenhum grupo ainda</h3>
+      <p className="text-sm text-gray-500 mb-6 max-w-xs mx-auto">
+        Crie um grupo para começar seu bolão ou entre com o código de um amigo.
+      </p>
+      <div className="flex items-center justify-center gap-3">
+        <button onClick={onJoin} className="btn-outline">
+          <Hash className="w-3.5 h-3.5" />
+          Entrar com código
+        </button>
+        <button onClick={onCreate} className="btn-primary">
+          <Plus className="w-3.5 h-3.5" />
+          Criar grupo
         </button>
       </div>
     </div>

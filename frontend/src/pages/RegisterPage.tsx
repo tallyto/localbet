@@ -1,6 +1,7 @@
 import { useState, FormEvent } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { Mail, Lock, Eye, EyeOff, User, AlertCircle } from 'lucide-react'
 
 export function RegisterPage() {
   const { register } = useAuth()
@@ -8,6 +9,7 @@ export function RegisterPage() {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [acceptedTerms, setAcceptedTerms] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
@@ -16,7 +18,7 @@ export function RegisterPage() {
     e.preventDefault()
     setError('')
     if (!acceptedTerms) {
-      setError('Você precisa confirmar que leu e aceita os termos de uso.')
+      setError('Você precisa aceitar os termos de uso para continuar.')
       return
     }
     setLoading(true)
@@ -31,83 +33,146 @@ export function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
-      <div className="max-w-md w-full bg-white rounded-2xl shadow-md p-8">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-green-600">LocalBet</h1>
-          <p className="text-gray-500 mt-1">Crie sua conta</p>
+    <div className="min-h-screen flex">
+      {/* Brand panel */}
+      <div className="hidden lg:flex flex-col justify-between w-[420px] bg-brand-700 p-10 flex-shrink-0">
+        <div className="flex items-center gap-2">
+          <span className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center text-white font-bold">L</span>
+          <span className="text-white font-bold text-lg">LocalBet</span>
         </div>
+        <div>
+          <p className="text-white/90 text-3xl font-bold leading-tight mb-4">
+            Crie seu bolão<br />em minutos.
+          </p>
+          <ul className="space-y-3">
+            {[
+              'Grupos com código de convite',
+              'Campeonatos e rodadas organizadas',
+              'Ranking automático com pontuação',
+            ].map(item => (
+              <li key={item} className="flex items-center gap-2.5 text-white/70 text-sm">
+                <span className="w-1.5 h-1.5 rounded-full bg-brand-400 flex-shrink-0" />
+                {item}
+              </li>
+            ))}
+          </ul>
+        </div>
+        <p className="text-white/30 text-xs">© 2025 LocalBet</p>
+      </div>
 
-        {error && (
-          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
-            {error}
+      {/* Form panel */}
+      <div className="flex-1 flex items-center justify-center px-4 py-12 bg-gray-50">
+        <div className="w-full max-w-sm">
+          <div className="lg:hidden flex items-center gap-2 mb-8">
+            <span className="w-8 h-8 rounded-lg bg-brand-600 flex items-center justify-center text-white font-bold">L</span>
+            <span className="font-bold text-gray-900 text-lg">LocalBet</span>
           </div>
-        )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Nome</label>
-            <input
-              type="text"
-              value={name}
-              onChange={e => setName(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-              required
-              minLength={2}
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-            <input
-              type="email"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Senha</label>
-            <input
-              type="password"
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-              required
-              minLength={6}
-            />
-          </div>
-          <label className="flex items-start gap-3 text-sm text-gray-600">
-            <input
-              type="checkbox"
-              checked={acceptedTerms}
-              onChange={e => setAcceptedTerms(e.target.checked)}
-              className="mt-1 h-4 w-4 rounded border-gray-300 text-green-600 focus:ring-green-500"
-              required
-            />
-            <span>
-              Li e aceito os{' '}
-              <Link to="/terms" className="text-green-600 font-medium hover:underline">
-                termos de uso
-              </Link>
-              .
-            </span>
-          </label>
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-green-600 text-white py-2 rounded-lg font-medium hover:bg-green-700 disabled:opacity-60 transition-colors"
-          >
-            {loading ? 'Criando conta...' : 'Criar conta'}
-          </button>
-        </form>
+          <h1 className="text-2xl font-bold text-gray-900 mb-1">Crie sua conta</h1>
+          <p className="text-gray-500 text-sm mb-8">Grátis, sem cartão de crédito</p>
 
-        <p className="mt-6 text-center text-sm text-gray-500">
-          Já tem conta?{' '}
-          <Link to="/login" className="text-green-600 font-medium hover:underline">
-            Entrar
-          </Link>
-        </p>
+          {error && (
+            <div className="mb-5 flex items-center gap-2.5 p-3.5 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+              <AlertCircle className="w-4 h-4 flex-shrink-0" />
+              {error}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">Nome</label>
+              <div className="relative">
+                <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <input
+                  type="text"
+                  value={name}
+                  onChange={e => setName(e.target.value)}
+                  placeholder="Seu nome completo"
+                  className="input-base pl-9"
+                  required
+                  minLength={2}
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">Email</label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <input
+                  type="email"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  placeholder="seu@email.com"
+                  className="input-base pl-9"
+                  required
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">Senha</label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                  placeholder="Mínimo 6 caracteres"
+                  className="input-base pl-9 pr-10"
+                  required
+                  minLength={6}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(v => !v)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  tabIndex={-1}
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
+
+            <label className="flex items-start gap-3 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={acceptedTerms}
+                onChange={e => setAcceptedTerms(e.target.checked)}
+                className="mt-0.5 h-4 w-4 rounded border-gray-300 text-brand-600 focus:ring-brand-500"
+              />
+              <span className="text-sm text-gray-600 leading-relaxed">
+                Li e aceito os{' '}
+                <Link to="/terms" target="_blank" className="text-brand-600 font-medium hover:text-brand-700 underline underline-offset-2">
+                  termos de uso
+                </Link>
+              </span>
+            </label>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="btn-primary w-full mt-2 py-2.5"
+            >
+              {loading ? (
+                <span className="flex items-center gap-2">
+                  <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+                  </svg>
+                  Criando conta...
+                </span>
+              ) : 'Criar conta grátis'}
+            </button>
+          </form>
+
+          <p className="mt-6 text-center text-sm text-gray-500">
+            Já tem conta?{' '}
+            <Link to="/login" className="text-brand-600 font-semibold hover:text-brand-700">
+              Entrar
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   )

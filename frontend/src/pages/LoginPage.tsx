@@ -1,12 +1,14 @@
 import { useState, FormEvent } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { Mail, Lock, Eye, EyeOff, AlertCircle } from 'lucide-react'
 
 export function LoginPage() {
   const { login } = useAuth()
   const navigate = useNavigate()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -25,55 +27,105 @@ export function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
-      <div className="max-w-md w-full bg-white rounded-2xl shadow-md p-8">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-green-600">LocalBet</h1>
-          <p className="text-gray-500 mt-1">Entre na sua conta</p>
+    <div className="min-h-screen flex">
+      {/* Brand panel */}
+      <div className="hidden lg:flex flex-col justify-between w-[420px] bg-brand-700 p-10 flex-shrink-0">
+        <div className="flex items-center gap-2">
+          <span className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center text-white font-bold">L</span>
+          <span className="text-white font-bold text-lg">LocalBet</span>
         </div>
+        <div>
+          <p className="text-white/90 text-3xl font-bold leading-tight mb-4">
+            Bolão com os amigos,<br />do jeito certo.
+          </p>
+          <p className="text-white/60 text-sm leading-relaxed">
+            Sem banco, sem anúncios. Apenas você e seus amigos apostando nos jogos que mais amam.
+          </p>
+        </div>
+        <p className="text-white/30 text-xs">© 2025 LocalBet</p>
+      </div>
 
-        {error && (
-          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
-            {error}
+      {/* Form panel */}
+      <div className="flex-1 flex items-center justify-center px-4 py-12 bg-gray-50">
+        <div className="w-full max-w-sm">
+          <div className="lg:hidden flex items-center gap-2 mb-8">
+            <span className="w-8 h-8 rounded-lg bg-brand-600 flex items-center justify-center text-white font-bold">L</span>
+            <span className="font-bold text-gray-900 text-lg">LocalBet</span>
           </div>
-        )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-            <input
-              type="email"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Senha</label>
-            <input
-              type="password"
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-              required
-            />
-          </div>
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-green-600 text-white py-2 rounded-lg font-medium hover:bg-green-700 disabled:opacity-60 transition-colors"
-          >
-            {loading ? 'Entrando...' : 'Entrar'}
-          </button>
-        </form>
+          <h1 className="text-2xl font-bold text-gray-900 mb-1">Bem-vindo de volta</h1>
+          <p className="text-gray-500 text-sm mb-8">Entre na sua conta para continuar</p>
 
-        <p className="mt-6 text-center text-sm text-gray-500">
-          Não tem conta?{' '}
-          <Link to="/register" className="text-green-600 font-medium hover:underline">
-            Cadastre-se
-          </Link>
-        </p>
+          {error && (
+            <div className="mb-5 flex items-center gap-2.5 p-3.5 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+              <AlertCircle className="w-4 h-4 flex-shrink-0" />
+              {error}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">Email</label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <input
+                  type="email"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  placeholder="seu@email.com"
+                  className="input-base pl-9"
+                  required
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">Senha</label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="input-base pl-9 pr-10"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(v => !v)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  tabIndex={-1}
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="btn-primary w-full mt-2 py-2.5"
+            >
+              {loading ? (
+                <span className="flex items-center gap-2">
+                  <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+                  </svg>
+                  Entrando...
+                </span>
+              ) : 'Entrar'}
+            </button>
+          </form>
+
+          <p className="mt-6 text-center text-sm text-gray-500">
+            Não tem conta?{' '}
+            <Link to="/register" className="text-brand-600 font-semibold hover:text-brand-700">
+              Cadastre-se grátis
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   )

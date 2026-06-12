@@ -9,6 +9,7 @@ import { useAuth } from '../context/AuthContext'
 import { Championship, Match } from '../types'
 import { ConfirmDialog } from '../components/ConfirmDialog'
 import { DateTimePicker } from '../components/DateTimePicker'
+import { Plus, Trophy, Swords, Trash2, ChevronDown, ChevronUp, Loader2, Target, Info, List, Columns } from 'lucide-react'
 
 function Tooltip({ children, content }: { children: React.ReactNode; content: React.ReactNode }) {
   return (
@@ -49,6 +50,18 @@ const EXACT_ONLY_TOOLTIP = (
 const formatCurrency = (value: number) =>
   value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
 
+const formatMatchDate = (dateStr: string) => {
+  const d = new Date(dateStr)
+  const weekdays = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb']
+  const months = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez']
+  const day = weekdays[d.getDay()]
+  const date = d.getDate()
+  const month = months[d.getMonth()]
+  const hours = d.getHours().toString().padStart(2, '0')
+  const minutes = d.getMinutes().toString().padStart(2, '0')
+  return `${day} ${date} ${month} · ${hours}:${minutes}`
+}
+
 export function GroupPage() {
   const { groupId } = useParams<{ groupId: string }>()
   const { user } = useAuth()
@@ -76,21 +89,27 @@ export function GroupPage() {
 
   return (
     <Layout breadcrumb={group ? [{ label: 'Meus grupos', href: '/dashboard' }, { label: group.name }] : undefined}>
-      <div className="flex gap-4 mb-6 border-b border-gray-200">
+      <div className="flex gap-1 mb-6 bg-gray-100 p-1 rounded-xl w-fit">
         <button
           onClick={() => setTab('matches')}
-          className={`pb-3 text-sm font-medium border-b-2 transition-colors ${
-            tab === 'matches' ? 'border-green-600 text-green-600' : 'border-transparent text-gray-500 hover:text-gray-700'
+          className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+            tab === 'matches'
+              ? 'bg-white text-gray-900 shadow-card'
+              : 'text-gray-500 hover:text-gray-700'
           }`}
         >
+          <Swords className="w-3.5 h-3.5" />
           Partidas
         </button>
         <button
           onClick={() => setTab('leaderboard')}
-          className={`pb-3 text-sm font-medium border-b-2 transition-colors ${
-            tab === 'leaderboard' ? 'border-green-600 text-green-600' : 'border-transparent text-gray-500 hover:text-gray-700'
+          className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+            tab === 'leaderboard'
+              ? 'bg-white text-gray-900 shadow-card'
+              : 'text-gray-500 hover:text-gray-700'
           }`}
         >
+          <Trophy className="w-3.5 h-3.5" />
           Ranking
         </button>
       </div>
@@ -98,21 +117,25 @@ export function GroupPage() {
       {tab === 'matches' && (
         <div>
           <div className="flex justify-between items-center mb-4">
-            <h2 className="font-semibold text-gray-700">Partidas</h2>
-            <div className="flex gap-2">
-              <button
-                onClick={() => setShowNewChampionship(true)}
-                className="px-3 py-1.5 border border-green-600 text-green-600 text-sm rounded-lg hover:bg-green-50 transition-colors"
-              >
-                + Campeonato
-              </button>
-              <button
-                onClick={() => setShowNewMatch(true)}
-                className="px-3 py-1.5 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition-colors"
-              >
-                + Partida
-              </button>
-            </div>
+            <h2 className="font-semibold text-gray-900">Partidas</h2>
+            {isOwner && (
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setShowNewChampionship(true)}
+                  className="btn-outline text-xs px-3 py-1.5 gap-1"
+                >
+                  <Plus className="w-3 h-3" />
+                  Campeonato
+                </button>
+                <button
+                  onClick={() => setShowNewMatch(true)}
+                  className="btn-primary text-xs px-3 py-1.5 gap-1"
+                >
+                  <Plus className="w-3 h-3" />
+                  Partida
+                </button>
+              </div>
+            )}
           </div>
 
           {showNewChampionship && (
@@ -124,9 +147,15 @@ export function GroupPage() {
           )}
 
           {isLoading ? (
-            <div className="text-center py-8 text-gray-400">Carregando...</div>
+            <MatchesSkeleton />
           ) : matches?.length === 0 && championships?.length === 0 ? (
-            <p className="text-center py-8 text-gray-400">Nenhuma partida ou campeonato cadastrado ainda.</p>
+            <div className="card p-10 text-center mt-2">
+              <div className="w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center mx-auto mb-3">
+                <Swords className="w-6 h-6 text-gray-400" />
+              </div>
+              <p className="font-medium text-gray-700 mb-1">Nenhuma partida ainda</p>
+              <p className="text-sm text-gray-400">Crie um campeonato ou adicione partidas avulsas.</p>
+            </div>
           ) : (
             <MatchList matches={matches ?? []} championships={championships ?? []} groupId={groupId} isOwner={isOwner} />
           )}
@@ -136,9 +165,9 @@ export function GroupPage() {
       {tab === 'leaderboard' && (
         <div>
           <div className="flex items-center gap-2 mb-3">
-            <h2 className="font-semibold text-gray-700">Ranking</h2>
+            <h2 className="font-semibold text-gray-900">Ranking</h2>
             <Tooltip content={SCORING_RULES_TOOLTIP}>
-              <span className="text-gray-400 text-sm cursor-help">ⓘ</span>
+              <Info className="w-4 h-4 text-gray-400 cursor-help" />
             </Tooltip>
           </div>
 
@@ -182,30 +211,49 @@ export function GroupPage() {
           </div>
 
           {!leaderboard?.length ? (
-            <p className="text-center py-8 text-gray-400">Ainda não há pontuação registrada.</p>
+            <div className="card p-10 text-center mt-2">
+              <div className="w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center mx-auto mb-3">
+                <Trophy className="w-6 h-6 text-gray-400" />
+              </div>
+              <p className="font-medium text-gray-700 mb-1">Nenhuma pontuação ainda</p>
+              <p className="text-sm text-gray-400">O ranking aparece quando as primeiras partidas forem finalizadas.</p>
+            </div>
           ) : (
             <div className="space-y-2">
-              {leaderboard.map((entry, i) => (
-                <div key={entry.userId} className="flex items-center gap-3 p-4 bg-white rounded-xl border border-gray-200">
-                  <span className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 ${
-                    i === 0 ? 'bg-yellow-100 text-yellow-700' :
-                    i === 1 ? 'bg-gray-100 text-gray-600' :
-                    i === 2 ? 'bg-orange-100 text-orange-700' :
-                    'bg-gray-50 text-gray-500'
-                  }`}>{i + 1}</span>
+              {leaderboard.map((entry, i) => {
+                const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : null
+                return (
+                  <div key={entry.userId} className={`flex items-center gap-3 p-4 rounded-xl border transition-colors ${
+                    i === 0 ? 'bg-yellow-50 border-yellow-200' :
+                    i === 1 ? 'bg-gray-50 border-gray-200' :
+                    i === 2 ? 'bg-orange-50 border-orange-100' :
+                    'bg-white border-gray-200'
+                  }`}>
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 ${
+                      i === 0 ? 'bg-yellow-100 text-yellow-700' :
+                      i === 1 ? 'bg-gray-200 text-gray-600' :
+                      i === 2 ? 'bg-orange-100 text-orange-600' :
+                      'bg-gray-100 text-gray-500'
+                    }`}>
+                      {medal ?? i + 1}
+                    </div>
 
-                  <div className="flex-1 min-w-0">
-                    <p className="font-medium text-gray-800">{entry.userName}</p>
-                    <p className="text-xs text-gray-400">
-                      {entry.exactScores} acerto(s) exato(s)
-                    </p>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-gray-900">{entry.userName}</p>
+                      <p className="text-xs text-gray-400 flex items-center gap-1">
+                        <Target className="w-3 h-3" />
+                        {entry.exactScores} acerto{entry.exactScores !== 1 ? 's' : ''} exato{entry.exactScores !== 1 ? 's' : ''}
+                      </p>
+                    </div>
+
+                    <span className={`text-base font-bold flex-shrink-0 ${
+                      i === 0 ? 'text-yellow-600' : i === 1 ? 'text-gray-600' : i === 2 ? 'text-orange-500' : 'text-brand-600'
+                    }`}>
+                      {entry.totalPoints} pts
+                    </span>
                   </div>
-
-                  <span className="text-lg font-bold text-green-600 flex-shrink-0">
-                    {entry.totalPoints} pts
-                  </span>
-                </div>
-              ))}
+                )
+              })}
             </div>
           )}
         </div>
@@ -372,6 +420,7 @@ function MatchList({ matches, championships, groupId, isOwner }: {
   isOwner: boolean
 }) {
   const [selectedMatchId, setSelectedMatchId] = useState<string | null>(null)
+  const [bracketChampionships, setBracketChampionships] = useState<Set<string>>(new Set())
 
   // Separar partidas com e sem campeonato
   const withChampionship = matches.filter(m => m.championship)
@@ -393,36 +442,71 @@ function MatchList({ matches, championships, groupId, isOwner }: {
     byChampionship[cId].rounds[roundId].matches.push(match)
   })
 
+  function toggleBracket(cId: string, enabled: boolean) {
+    setBracketChampionships(prev => {
+      const next = new Set(prev)
+      if (enabled) next.add(cId)
+      else next.delete(cId)
+      return next
+    })
+  }
+
   return (
     <div className="space-y-6">
-      {Object.values(byChampionship).map(({ championship, rounds }) => (
-        <div key={championship.id}>
-          <ChampionshipHeader championship={championship} isOwner={isOwner} />
-          <div className="space-y-4 pl-2 border-l-2 border-green-100">
-            {Object.keys(rounds).length === 0 ? (
-              <p className="text-xs text-gray-400 py-2">Nenhum jogo neste campeonato.</p>
-            ) : Object.values(rounds)
-              .sort((a, b) => (a.orderNum ?? 9999) - (b.orderNum ?? 9999))
-              .map(({ roundId, roundName, matches: roundMatches }) => (
-              <div key={roundId}>
-                <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">{roundName}</p>
-                <div className="space-y-2">
-                  {roundMatches.map(match => (
-                    <MatchCard
-                      key={match.id}
-                      match={match}
-                      groupId={groupId}
-                      isOwner={isOwner}
-                      isSelected={selectedMatchId === match.id}
-                      onSelect={() => setSelectedMatchId(selectedMatchId === match.id ? null : match.id)}
-                    />
-                  ))}
-                </div>
+      {Object.values(byChampionship).map(({ championship, rounds }) => {
+        const isBracket = bracketChampionships.has(championship.id)
+        const roundList = Object.values(rounds).sort((a, b) => (a.orderNum ?? 9999) - (b.orderNum ?? 9999))
+        const hasRounds = roundList.some(r => r.roundId !== 'no-round')
+
+        return (
+          <div key={championship.id}>
+            <ChampionshipHeader championship={championship} isOwner={isOwner} />
+
+            {hasRounds && (
+              <div className="flex gap-0.5 mb-3 bg-gray-100 p-0.5 rounded-lg w-fit">
+                <button
+                  onClick={() => toggleBracket(championship.id, false)}
+                  className={`flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium transition-colors ${!isBracket ? 'bg-white text-gray-800 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                >
+                  <List className="w-3 h-3" /> Lista
+                </button>
+                <button
+                  onClick={() => toggleBracket(championship.id, true)}
+                  className={`flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium transition-colors ${isBracket ? 'bg-white text-gray-800 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                >
+                  <Columns className="w-3 h-3" /> Chave
+                </button>
               </div>
-            ))}
+            )}
+
+            {isBracket ? (
+              <BracketView roundGroups={roundList} />
+            ) : (
+              <div className="space-y-4 pl-2 border-l-2 border-green-100">
+                {roundList.length === 0 ? (
+                  <p className="text-xs text-gray-400 py-2">Nenhum jogo neste campeonato.</p>
+                ) : roundList.map(({ roundId, roundName, matches: roundMatches }) => (
+                  <div key={roundId}>
+                    <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">{roundName}</p>
+                    <div className="space-y-2">
+                      {roundMatches.map(match => (
+                        <MatchCard
+                          key={match.id}
+                          match={match}
+                          groupId={groupId}
+                          isOwner={isOwner}
+                          isSelected={selectedMatchId === match.id}
+                          onSelect={() => setSelectedMatchId(selectedMatchId === match.id ? null : match.id)}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
-        </div>
-      ))}
+        )
+      })}
 
       {withoutChampionship.length > 0 && (
         <div>
@@ -518,39 +602,57 @@ function MatchCard({ match, groupId, isOwner, isSelected, onSelect }: {
   }
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-      <button onClick={onSelect} className="w-full text-left p-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3 flex-1">
-            <span className="text-sm font-medium text-gray-800">{match.homeTeam}</span>
-            <span className="text-gray-400 text-sm">
-              {match.status === 'FINISHED'
-                ? `${match.homeScore} - ${match.awayScore}`
-                : 'vs'}
-            </span>
-            <span className="text-sm font-medium text-gray-800">{match.awayTeam}</span>
+    <div className={`card overflow-hidden transition-all ${isSelected ? 'border-brand-200' : ''}`}>
+      <button onClick={onSelect} className="w-full text-left p-4 hover:bg-gray-50/60 transition-colors">
+        <div className="flex items-center gap-2 justify-between">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 min-w-0">
+              <span className="text-sm font-semibold text-gray-900 truncate">{match.homeTeam}</span>
+              <span className={`text-xs font-bold px-2 py-1 rounded-lg flex-shrink-0 ${
+                match.status === 'FINISHED'
+                  ? 'bg-gray-100 text-gray-700 font-mono'
+                  : 'bg-gray-100 text-gray-400'
+              }`}>
+                {match.status === 'FINISHED' ? `${match.homeScore} - ${match.awayScore}` : 'vs'}
+              </span>
+              <span className="text-sm font-semibold text-gray-900 truncate">{match.awayTeam}</span>
+            </div>
+            <p className="text-xs text-gray-400 mt-1">{formatMatchDate(match.matchDate)}</p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-shrink-0">
             {myBet && match.status !== 'FINISHED' && (
-              <span className="text-xs text-green-600 font-medium">
-                Aposta: {myBet.homeScore}×{myBet.awayScore}
+              <span className="text-xs bg-brand-50 text-brand-700 font-medium px-2 py-0.5 rounded-full border border-brand-100">
+                {myBet.homeScore}×{myBet.awayScore}
+              </span>
+            )}
+            {myBet && match.status === 'FINISHED' && myBet.result && (
+              <span className={`text-xs font-medium px-2 py-0.5 rounded-full border ${
+                myBet.result.isExact ? 'bg-green-50 text-green-700 border-green-200' :
+                myBet.result.points > 0 ? 'bg-blue-50 text-blue-700 border-blue-200' :
+                'bg-gray-100 text-gray-500 border-gray-200'
+              }`}>
+                {myBet.result.points} pts
               </span>
             )}
             <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
               match.status === 'FINISHED' ? 'bg-gray-100 text-gray-500' :
-              match.status === 'IN_PROGRESS' ? 'bg-green-100 text-green-700' :
-              'bg-blue-100 text-blue-600'
+              match.status === 'IN_PROGRESS' ? 'bg-brand-100 text-brand-700' :
+              'bg-blue-50 text-blue-600'
             }`}>{statusLabel[match.status] ?? match.status}</span>
             {isOwner && (
               <button
                 onClick={handleDelete}
                 disabled={deleteMatch.isPending}
-                className="text-gray-300 hover:text-red-500 transition-colors text-xs px-1"
+                className="p-1 rounded text-gray-300 hover:text-red-500 hover:bg-red-50 transition-colors"
                 title="Excluir partida"
               >
-                ✕
+                <Trash2 className="w-3.5 h-3.5" />
               </button>
             )}
+            {isSelected
+              ? <ChevronUp className="w-4 h-4 text-gray-400" />
+              : <ChevronDown className="w-4 h-4 text-gray-400" />
+            }
           </div>
         </div>
       </button>
@@ -578,12 +680,12 @@ function MatchCard({ match, groupId, isOwner, isSelected, onSelect }: {
                 <>
                   <form onSubmit={handleBet} className="flex flex-wrap items-center gap-2">
                     <input type="number" min="0" value={betHome} onChange={e => setBetHome(e.target.value)}
-                      placeholder="0" className="w-16 text-center border border-gray-300 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-500" required />
-                    <span className="text-gray-400">x</span>
+                      placeholder="0" className="w-16 text-center input-base py-1.5 px-2" required />
+                    <span className="text-gray-400 font-medium">×</span>
                     <input type="number" min="0" value={betAway} onChange={e => setBetAway(e.target.value)}
-                      placeholder="0" className="w-16 text-center border border-gray-300 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-500" required />
-                    <div className={`flex items-center gap-1 border rounded-lg px-2 py-1.5 text-sm ${
-                      defaultAmt ? 'border-gray-200 bg-gray-50' : 'border-gray-300 focus-within:ring-2 focus-within:ring-green-500'
+                      placeholder="0" className="w-16 text-center input-base py-1.5 px-2" required />
+                    <div className={`flex items-center gap-1 border rounded-lg px-2 py-1.5 text-sm bg-white ${
+                      defaultAmt ? 'border-gray-200 bg-gray-50' : 'border-gray-200 focus-within:ring-2 focus-within:ring-brand-500 focus-within:border-transparent'
                     }`}>
                       <span className="text-gray-400 text-xs">R$</span>
                       <input
@@ -597,9 +699,8 @@ function MatchCard({ match, groupId, isOwner, isSelected, onSelect }: {
                         <span className="text-gray-400 text-xs" title="Valor fixo definido pelo campeonato">🔒</span>
                       )}
                     </div>
-                    <button type="submit" disabled={placeBet.isPending}
-                      className="px-3 py-1.5 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 disabled:opacity-60">
-                      Apostar
+                    <button type="submit" disabled={placeBet.isPending} className="btn-primary px-3 py-1.5 text-xs">
+                      {placeBet.isPending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : 'Apostar'}
                     </button>
                   </form>
                   {betError && <p className="text-red-500 text-xs mt-1">{betError}</p>}
@@ -610,17 +711,17 @@ function MatchCard({ match, groupId, isOwner, isSelected, onSelect }: {
 
           {/* Placar final — só o dono do grupo pode registrar/editar */}
           {isOwner && match.status !== 'FINISHED' && (
-            <div>
-              <p className="text-sm font-medium text-gray-700 mb-2">Registrar placar final</p>
+            <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
+              <p className="text-xs font-semibold text-gray-600 uppercase tracking-wide mb-2">Registrar placar final</p>
               <form onSubmit={handleScore} className="flex items-center gap-2">
                 <input type="number" min="0" value={scoreHome} onChange={e => setScoreHome(e.target.value)}
-                  placeholder="0" className="w-16 text-center border border-gray-300 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-500" required />
-                <span className="text-gray-400">x</span>
+                  placeholder="0" className="w-16 text-center input-base py-1.5 px-2" required />
+                <span className="text-gray-400 font-medium">×</span>
                 <input type="number" min="0" value={scoreAway} onChange={e => setScoreAway(e.target.value)}
-                  placeholder="0" className="w-16 text-center border border-gray-300 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-500" required />
+                  placeholder="0" className="w-16 text-center input-base py-1.5 px-2" required />
                 <button type="submit" disabled={setScore.isPending}
-                  className="px-3 py-1.5 bg-gray-700 text-white text-sm rounded-lg hover:bg-gray-800 disabled:opacity-60">
-                  Finalizar
+                  className="btn-primary px-3 py-1.5 text-xs bg-gray-800 hover:bg-gray-900">
+                  {setScore.isPending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : 'Finalizar'}
                 </button>
               </form>
             </div>
@@ -654,6 +755,50 @@ function MatchCard({ match, groupId, isOwner, isSelected, onSelect }: {
                 </form>
               )}
             </div>
+          )}
+
+          {/* Meu resultado — só quando finalizada e apostou */}
+          {match.status === 'FINISHED' && myBet && (
+            <div>
+              <p className="text-sm font-medium text-gray-700 mb-1.5">Meu resultado</p>
+              <div className={`flex items-center justify-between p-3 rounded-lg border text-sm ${
+                myBet.result?.isExact ? 'bg-green-50 border-green-200' :
+                (myBet.result?.points ?? 0) > 0 ? 'bg-blue-50 border-blue-200' :
+                'bg-gray-50 border-gray-200'
+              }`}>
+                <div className="flex items-center gap-2.5">
+                  <span className="font-mono font-bold text-gray-800">{myBet.homeScore} × {myBet.awayScore}</span>
+                  {myBet.result?.isExact && (
+                    <span className="text-xs bg-green-100 text-green-700 px-1.5 py-0.5 rounded-full font-medium">Placar exato!</span>
+                  )}
+                </div>
+                <div className="flex items-center gap-3">
+                  {myBet.result && (
+                    <span className={`font-semibold ${myBet.result.points === 0 ? 'text-gray-400' : 'text-blue-600'}`}>
+                      {myBet.result.points} pts
+                    </span>
+                  )}
+                  {myBet.amount > 0 && myBet.result && (
+                    <span className={`font-semibold ${
+                      myBet.result.winnings > myBet.amount ? 'text-green-600' :
+                      myBet.result.winnings === myBet.amount ? 'text-gray-500' : 'text-red-500'
+                    }`}>
+                      {myBet.result.winnings > 0
+                        ? (myBet.result.winnings === myBet.amount
+                            ? formatCurrency(myBet.result.winnings) + ' (devolvido)'
+                            : `${formatCurrency(myBet.result.winnings)} (+${formatCurrency(myBet.result.winnings - myBet.amount)})`)
+                        : 'Sem ganhos'
+                      }
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Não apostou — só quando finalizada e não apostou */}
+          {match.status === 'FINISHED' && !myBet && (
+            <p className="text-xs text-gray-400 italic">Você não apostou neste jogo.</p>
           )}
 
           {/* Apostas (visíveis só após finalizar) */}
@@ -757,6 +902,72 @@ function MatchCard({ match, groupId, isOwner, isSelected, onSelect }: {
   )
 }
 
+function BracketView({ roundGroups }: {
+  roundGroups: { roundId: string; roundName: string; orderNum?: number; matches: Match[] }[]
+}) {
+  const phaseRounds = roundGroups.filter(r => r.roundId !== 'no-round')
+
+  if (phaseRounds.length === 0) {
+    return <p className="text-xs text-gray-400 py-2">Nenhum jogo neste campeonato.</p>
+  }
+
+  return (
+    <div className="overflow-x-auto -mx-1 px-1 pb-3">
+      <div className="flex gap-3 min-w-max">
+        {phaseRounds.map(({ roundId, roundName, matches }) => (
+          <div key={roundId} className="w-52 flex-shrink-0">
+            <p className="text-[11px] font-bold text-gray-500 uppercase tracking-wider text-center pb-2 mb-2.5 border-b border-gray-100">
+              {roundName}
+              <span className="ml-1 font-normal text-gray-300">({matches.length})</span>
+            </p>
+            <div className="space-y-2">
+              {matches.map(match => (
+                <BracketMatchCard key={match.id} match={match} />
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function BracketMatchCard({ match }: { match: Match }) {
+  const finished = match.status === 'FINISHED'
+  const inProgress = match.status === 'IN_PROGRESS'
+  const homeWins = finished && (match.homeScore ?? 0) > (match.awayScore ?? 0)
+  const awayWins = finished && (match.awayScore ?? 0) > (match.homeScore ?? 0)
+
+  return (
+    <div className={`rounded-xl border overflow-hidden text-xs transition-colors ${
+      inProgress ? 'border-brand-200' : 'border-gray-200'
+    }`}>
+      <div className={`px-2.5 py-1.5 text-[10px] font-medium leading-none ${
+        inProgress ? 'bg-brand-500 text-white' :
+        finished ? 'bg-gray-100 text-gray-500' :
+        'bg-gray-50 text-gray-400'
+      }`}>
+        {inProgress ? (
+          <span className="flex items-center gap-1">
+            <span className="w-1.5 h-1.5 rounded-full bg-white/80 animate-pulse inline-block" />
+            Em andamento
+          </span>
+        ) : finished ? 'Encerrado' : formatMatchDate(match.matchDate)}
+      </div>
+      <div className="bg-white divide-y divide-gray-100">
+        <div className={`flex items-center justify-between px-2.5 py-2 gap-2 ${homeWins ? 'font-bold text-gray-900' : 'text-gray-400'}`}>
+          <span className="truncate">{match.homeTeam}</span>
+          {finished && <span className="font-mono font-bold flex-shrink-0 text-gray-700">{match.homeScore}</span>}
+        </div>
+        <div className={`flex items-center justify-between px-2.5 py-2 gap-2 ${awayWins ? 'font-bold text-gray-900' : 'text-gray-400'}`}>
+          <span className="truncate">{match.awayTeam}</span>
+          {finished && <span className="font-mono font-bold flex-shrink-0 text-gray-700">{match.awayScore}</span>}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 function NewMatchForm({ groupId, championships, onClose }: {
   groupId: string
   championships: import('../types').Championship[]
@@ -799,8 +1010,8 @@ function NewMatchForm({ groupId, championships, onClose }: {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="mb-4 p-4 bg-white rounded-xl border border-gray-200 space-y-3">
-      <h3 className="font-medium text-gray-800 text-sm">Nova Partida</h3>
+    <form onSubmit={handleSubmit} className="mb-4 card p-4 space-y-3 border-brand-100">
+      <h3 className="font-semibold text-gray-900 text-sm">Nova Partida</h3>
       {championships.length > 0 && (
         <select
           value={form.championshipId}
@@ -815,7 +1026,7 @@ function NewMatchForm({ groupId, championships, onClose }: {
             }))
             setCreatingRound(false)
           }}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+          className="input-base">
           <option value="">Sem campeonato</option>
           {championships.map(c => (
             <option key={c.id} value={c.id}>{c.name}{c.season ? ` ${c.season}` : ''}</option>
@@ -882,10 +1093,10 @@ function NewMatchForm({ groupId, championships, onClose }: {
       />
       <div className="flex gap-2">
         <button type="submit" disabled={createMatch.isPending || createRound.isPending}
-          className="px-4 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 disabled:opacity-60">
+          className="btn-primary text-xs">
           {createMatch.isPending ? 'Criando...' : 'Criar partida'}
         </button>
-        <button type="button" onClick={onClose} className="px-4 py-2 text-gray-500 text-sm hover:text-gray-700">
+        <button type="button" onClick={onClose} className="btn-ghost text-xs">
           Cancelar
         </button>
       </div>
@@ -917,11 +1128,11 @@ function NewChampionshipForm({ groupId, onClose }: { groupId: string; onClose: (
   }
 
   return (
-    <form onSubmit={handleSubmit} className="mb-4 p-4 bg-white rounded-xl border border-green-200 space-y-3">
-      <h3 className="font-medium text-gray-800 text-sm">Novo Campeonato</h3>
+    <form onSubmit={handleSubmit} className="mb-4 card p-4 space-y-3 border-brand-100">
+      <h3 className="font-semibold text-gray-900 text-sm">Novo Campeonato</h3>
       <input value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
         placeholder="Nome (ex: Série A, Copa do Mundo)" required
-        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
+        className="input-base" />
       <div className="flex gap-2">
         <input value={form.season} onChange={e => setForm(f => ({ ...f, season: e.target.value }))}
           placeholder="Temporada (ex: 2026)" className="w-32 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
@@ -972,13 +1183,30 @@ function NewChampionshipForm({ groupId, onClose }: { groupId: string; onClose: (
 
       <div className="flex gap-2">
         <button type="submit" disabled={createChampionship.isPending}
-          className="px-4 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 disabled:opacity-60">
-          {createChampionship.isPending ? 'Criando...' : 'Criar campeonato'}
+          className="btn-primary text-xs">
+          {createChampionship.isPending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : 'Criar campeonato'}
         </button>
-        <button type="button" onClick={onClose} className="px-4 py-2 text-gray-500 text-sm hover:text-gray-700">
+        <button type="button" onClick={onClose} className="btn-ghost text-xs">
           Cancelar
         </button>
       </div>
     </form>
+  )
+}
+
+function MatchesSkeleton() {
+  return (
+    <div className="space-y-3 mt-2">
+      {[1, 2, 3].map(i => (
+        <div key={i} className="card p-4">
+          <div className="flex items-center gap-3">
+            <div className="skeleton h-4 w-24 rounded" />
+            <div className="skeleton h-5 w-12 rounded-lg" />
+            <div className="skeleton h-4 w-24 rounded" />
+            <div className="ml-auto skeleton h-5 w-16 rounded-full" />
+          </div>
+        </div>
+      ))}
+    </div>
   )
 }

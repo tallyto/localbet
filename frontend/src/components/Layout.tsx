@@ -1,5 +1,6 @@
 import { useAuth } from '../context/AuthContext'
 import { useNavigate, Link } from 'react-router-dom'
+import { LogOut, User, ChevronRight } from 'lucide-react'
 
 interface BreadcrumbItem {
   label: string
@@ -15,41 +16,61 @@ export function Layout({ children, breadcrumb }: { children: React.ReactNode; br
     navigate('/login')
   }
 
+  const initials = user?.name
+    ? user.name.split(' ').map((n: string) => n[0]).slice(0, 2).join('').toUpperCase()
+    : '?'
+
   return (
     <div className="min-h-screen bg-gray-50">
-      <nav className="bg-white border-b border-gray-200 px-4 py-3">
-        <div className="max-w-4xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-2 min-w-0">
-            <Link to="/dashboard" className="text-xl font-bold text-green-600 flex-shrink-0">
-              LocalBet
+      <nav className="bg-white shadow-nav sticky top-0 z-30">
+        <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
+          <div className="flex items-center gap-1.5 min-w-0">
+            <Link to="/dashboard" className="flex items-center gap-1.5 flex-shrink-0">
+              <span className="w-7 h-7 rounded-lg bg-brand-600 flex items-center justify-center text-white font-bold text-sm">
+                L
+              </span>
+              <span className="font-bold text-gray-900 text-sm hidden sm:block">LocalBet</span>
             </Link>
-            {breadcrumb && breadcrumb.map((item, i) => (
-              <span key={i} className="flex items-center gap-2 min-w-0">
-                <span className="text-gray-300">/</span>
+
+            {breadcrumb?.map((item, i) => (
+              <span key={i} className="flex items-center gap-1 min-w-0">
+                <ChevronRight className="w-3.5 h-3.5 text-gray-300 flex-shrink-0" />
                 {item.href ? (
-                  <Link to={item.href} className="text-sm text-gray-500 hover:text-gray-700 truncate max-w-[160px]">
+                  <Link to={item.href} className="text-sm text-gray-500 hover:text-gray-700 truncate max-w-[140px]">
                     {item.label}
                   </Link>
                 ) : (
-                  <span className="text-sm text-gray-700 font-medium truncate max-w-[160px]">{item.label}</span>
+                  <span className="text-sm text-gray-800 font-medium truncate max-w-[140px]">{item.label}</span>
                 )}
               </span>
             ))}
           </div>
-          <div className="flex items-center gap-4 flex-shrink-0">
-            <Link to="/account" className="text-sm text-gray-600 hover:text-gray-900 transition-colors">
-              {user?.name}
+
+          <div className="flex items-center gap-1 flex-shrink-0">
+            <Link
+              to="/account"
+              className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-gray-100 transition-colors group"
+            >
+              <div className="w-7 h-7 rounded-full bg-brand-100 text-brand-700 flex items-center justify-center text-xs font-bold">
+                {initials}
+              </div>
+              <span className="text-sm text-gray-700 hidden sm:block group-hover:text-gray-900 max-w-[120px] truncate">
+                {user?.name}
+              </span>
+              <User className="w-3.5 h-3.5 text-gray-400 hidden sm:block" />
             </Link>
             <button
               onClick={handleLogout}
-              className="text-sm text-gray-500 hover:text-red-500 transition-colors"
+              className="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors"
+              title="Sair"
             >
-              Sair
+              <LogOut className="w-4 h-4" />
             </button>
           </div>
         </div>
       </nav>
-      <main className="max-w-4xl mx-auto px-4 py-6">
+
+      <main className="max-w-5xl mx-auto px-4 py-6">
         {children}
       </main>
     </div>
