@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
+import { createContext, useContext, useState, ReactNode } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { api } from '../api/client'
 
@@ -21,17 +21,20 @@ const AuthContext = createContext<AuthContextType | null>(null)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const queryClient = useQueryClient()
-  const [user, setUser] = useState<AuthUser | null>(null)
-  const [token, setToken] = useState<string | null>(null)
-
-  useEffect(() => {
-    const savedToken = localStorage.getItem('token')
+  const [user, setUser] = useState<AuthUser | null>(() => {
     const savedUser = localStorage.getItem('user')
-    if (savedToken && savedUser) {
-      setToken(savedToken)
-      setUser(JSON.parse(savedUser))
+    if (!savedUser) return null
+    try {
+      return JSON.parse(savedUser)
+    } catch {
+      localStorage.removeItem('user')
+      return null
     }
-  }, [])
+  })
+  const [token, setToken] = useState<string | null>(() => {
+    const savedToken = localStorage.getItem('token')
+    return savedToken || null
+  })
 
   const login = async (email: string, password: string) => {
     const res = await api.post('/auth/login', { email, password })

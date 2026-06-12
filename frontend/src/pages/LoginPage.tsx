@@ -1,16 +1,18 @@
 import { useState, FormEvent } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { useNavigate, Link, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { Mail, Lock, Eye, EyeOff, AlertCircle } from 'lucide-react'
 
 export function LoginPage() {
   const { login } = useAuth()
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const redirect = safeRedirect(searchParams.get('redirect'))
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
@@ -18,7 +20,7 @@ export function LoginPage() {
     setLoading(true)
     try {
       await login(email, password)
-      navigate('/dashboard')
+      navigate(redirect)
     } catch {
       setError('Email ou senha inválidos')
     } finally {
@@ -125,7 +127,7 @@ export function LoginPage() {
 
           <p className="mt-6 text-center text-sm text-gray-500">
             Não tem conta?{' '}
-            <Link to="/register" className="text-brand-600 font-semibold hover:text-brand-700">
+            <Link to={`/register?redirect=${encodeURIComponent(redirect)}`} className="text-brand-600 font-semibold hover:text-brand-700">
               Cadastre-se grátis
             </Link>
           </p>
@@ -133,4 +135,9 @@ export function LoginPage() {
       </div>
     </div>
   )
+}
+
+function safeRedirect(value: string | null) {
+  if (value && value.startsWith('/') && !value.startsWith('//')) return value
+  return '/dashboard'
 }

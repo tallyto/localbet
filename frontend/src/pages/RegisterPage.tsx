@@ -1,11 +1,12 @@
 import { useState, FormEvent } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { useNavigate, Link, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { Mail, Lock, Eye, EyeOff, User, AlertCircle } from 'lucide-react'
 
 export function RegisterPage() {
   const { register } = useAuth()
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -13,6 +14,7 @@ export function RegisterPage() {
   const [acceptedTerms, setAcceptedTerms] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const redirect = safeRedirect(searchParams.get('redirect'))
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
@@ -24,7 +26,7 @@ export function RegisterPage() {
     setLoading(true)
     try {
       await register(name, email, password, acceptedTerms)
-      navigate('/dashboard')
+      navigate(redirect)
     } catch (err: any) {
       setError(err.response?.data?.error ?? 'Erro ao criar conta')
     } finally {
@@ -174,7 +176,7 @@ export function RegisterPage() {
 
           <p className="mt-6 text-center text-sm text-gray-500">
             Já tem conta?{' '}
-            <Link to="/login" className="text-brand-600 font-semibold hover:text-brand-700">
+            <Link to={`/login?redirect=${encodeURIComponent(redirect)}`} className="text-brand-600 font-semibold hover:text-brand-700">
               Entrar
             </Link>
           </p>
@@ -182,4 +184,9 @@ export function RegisterPage() {
       </div>
     </div>
   )
+}
+
+function safeRedirect(value: string | null) {
+  if (value && value.startsWith('/') && !value.startsWith('//')) return value
+  return '/dashboard'
 }
