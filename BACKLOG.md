@@ -4,16 +4,17 @@
 
 - [x] Gamified leaderboard with XP, levels, progress and badges.
 - [x] In-app notifications derived from leaderboard activity.
+- [x] Group activity feed with ranking, badge and match events.
+- [x] Group summary with match, championship and leader highlights.
+- [x] Player profile summary with XP, badges and accuracy.
+- [x] Ranking filters by week and month.
+- [x] Shareable invite links.
 
 ## Next
 
-- [ ] Group activity feed with ranking, badge and exact-score events.
-- [ ] Round summary with winner, biggest climb, exact-score highlights and participation.
-- [ ] Player profile with XP, badges, accuracy and betting history.
-- [ ] Ranking filters by round, week and month.
-- [ ] Shareable invite links.
-
-## Later
+- [ ] Ranking filters by round.
+- [ ] Full round summary with winner, biggest climb, exact-score highlights and participation.
+- [ ] Dedicated player profile page with betting history.
 
 - [ ] Group settings for default rules, default bet amount and visibility.
 - [ ] Member roles beyond owner/member.
