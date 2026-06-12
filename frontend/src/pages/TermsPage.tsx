@@ -3,13 +3,16 @@ import { Link } from 'react-router-dom'
 export function TermsPage() {
   return (
     <div className="min-h-screen bg-white text-gray-900">
-      <nav className="flex items-center justify-between px-6 py-4 max-w-5xl mx-auto border-b border-gray-100">
-        <Link to="/" className="font-bold text-xl text-green-600 tracking-tight">localbet</Link>
+      <nav aria-label="Navegação principal" className="flex items-center justify-between px-6 py-4 max-w-5xl mx-auto border-b border-gray-100">
+        <Link to="/" className="flex items-center gap-2">
+          <span aria-hidden="true" className="w-7 h-7 rounded-lg bg-brand-600 flex items-center justify-center text-white font-bold text-sm">L</span>
+          <span className="font-bold text-gray-900">LocalBet</span>
+        </Link>
         <div className="flex gap-3">
           <Link to="/login" className="text-sm text-gray-600 hover:text-gray-900 px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors">
             Entrar
           </Link>
-          <Link to="/register" className="text-sm bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors font-medium">
+          <Link to="/register" className="btn-primary text-sm px-4 py-2">
             Criar conta
           </Link>
         </div>
@@ -70,12 +73,12 @@ export function TermsPage() {
         <Section title="7. Contato">
           <p>
             Dúvidas, sugestões ou solicitações de exclusão de conta podem ser enviadas para{' '}
-            <a href="mailto:contato@localbet.app" className="text-green-600 hover:underline">contato@localbet.app</a>.
+            <a href="mailto:contato@localbet.app" className="text-brand-600 hover:underline">contato@localbet.app</a>.
           </p>
         </Section>
 
         <div className="mt-10 pt-6 border-t border-gray-100 text-center">
-          <Link to="/" className="text-sm text-green-600 hover:underline">← Voltar para o início</Link>
+          <Link to="/" className="text-sm text-brand-600 hover:underline">← Voltar para o início</Link>
         </div>
       </main>
     </div>
